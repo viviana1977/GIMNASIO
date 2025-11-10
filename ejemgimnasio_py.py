@@ -16,6 +16,21 @@ principal.pack(fill='both', expand=True, padx=10, pady=10)
 socio_frame = ttk.Frame(principal)
 principal.add(socio_frame, text="socio")
 
+def mostrar_formulario_alta():
+    """Muestra el formulario de registro y oculta el botón 'Alta'."""
+    btn_alta_socio.pack_forget()
+    form_frame.pack(padx=10, pady=10, fill="x")
+    btn_registrar.pack(pady=10)
+    btn_cancelar.pack(pady=5)
+
+def ocultar_formulario_alta():
+    """Oculta el formulario de registro y vuelve a mostrar el botón 'Alta'."""
+    form_frame.pack_forget()
+    btn_registrar.pack_forget()
+    btn_cancelar.pack_forget()
+    btn_alta_socio.pack(pady=20)
+
+
 def registrar_nuevo_socio():
     """Captura datos del formulario y crea un nuevo objeto Socio."""
     nombre = entry_nombre.get()
@@ -45,10 +60,12 @@ def registrar_nuevo_socio():
     # Limpiar campos del formulario
     for entry in [entry_nombre, entry_dni, entry_direccion, entry_fecha_nac, entry_telefono, entry_email, entry_talle, entry_peso, entry_objetivo]:
         entry.delete(0, tk.END)
+    
+    ocultar_formulario_alta()
 
 # --- Formulario de Registro de Socios ---
+# Se crea el frame del formulario pero no se muestra inicialmente (sin .pack())
 form_frame = ttk.LabelFrame(socio_frame, text="Registrar Nuevo Socio", padding=(20, 10))
-form_frame.pack(padx=10, pady=10, fill="x")
 
 # Creación de etiquetas y campos de entrada
 labels = ["Nombre y Apellido:", "DNI:", "Dirección:", "Fecha Nacimiento (DD/MM/AAAA):", "Teléfono:", "Email:", "Talle:", "Peso (kg):", "Objetivo:"]
@@ -68,9 +85,14 @@ for i, label_text in enumerate(labels):
 # Configurar la columna de los campos de entrada para que se expanda
 form_frame.columnconfigure(1, weight=1)
 
-# Botón de registro
+# --- Botones ---
+# Botón principal para mostrar el formulario
+btn_alta_socio = ttk.Button(socio_frame, text="Alta Socio", command=mostrar_formulario_alta)
+btn_alta_socio.pack(pady=20)
+
+# Botones del formulario (se crean pero no se muestran)
 btn_registrar = ttk.Button(socio_frame, text="Registrar Socio", command=registrar_nuevo_socio)
-btn_registrar.pack(pady=10)
+btn_cancelar = ttk.Button(socio_frame, text="Cancelar", command=ocultar_formulario_alta)
 
 # --- Otras Pestañas ---
 instructor_frame = ttk.Frame(principal)
