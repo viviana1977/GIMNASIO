@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import ttk
 from tkinter import *
+from datetime import datetime
 from tkinter import messagebox
 
 import gimnasio_modelo as gc
@@ -16,9 +17,19 @@ principal.pack(fill='both', expand=True, padx=10, pady=10)
 socio_frame = ttk.Frame(principal)
 principal.add(socio_frame, text="socio")
 
+socios_creados = []
+
+def actualizar_vista_socios():
+    """Limpia y actualiza la tabla de socios."""
+    for item in tree_socios.get_children():
+        tree_socios.delete(item)
+    for socio in socios_creados:
+        tree_socios.insert("", tk.END, values=(socio.id_socio, socio.nombre_apellido, socio.dni, socio.telefono))
+
 def mostrar_formulario_alta():
     """Muestra el formulario de registro y oculta el botón 'Alta'."""
     btn_alta_socio.pack_forget()
+    vista_socios_frame.pack_forget()
     form_frame.pack(padx=10, pady=10, fill="x")
     btn_registrar.pack(pady=10)
     btn_cancelar.pack(pady=5)
@@ -28,6 +39,7 @@ def ocultar_formulario_alta():
     form_frame.pack_forget()
     btn_registrar.pack_forget()
     btn_cancelar.pack_forget()
+    vista_socios_frame.pack(padx=10, pady=10, fill="both", expand=True)
     btn_alta_socio.pack(pady=20)
 
 
@@ -48,12 +60,11 @@ def registrar_nuevo_socio():
         messagebox.showerror("Error de validación", "Todos los campos son obligatorios.")
         return
 
-    # Aquí crearías el objeto y lo guardarías (por ahora solo imprimimos)
-    # nuevo_socio = gc.Socio(...)
-    print("Registrando nuevo socio:")
-    print(f"  Nombre: {nombre}, DNI: {dni}, Dirección: {direccion}")
-    print(f"  Nacimiento: {fecha_nac}, Teléfono: {telefono}, Email: {email}")
-    print(f"  Talle: {talle}, Peso: {peso}, Objetivo: {objetivo}")
+    # Crear y guardar el nuevo socio
+    id_socio = len(socios_creados) + 1
+    fecha_registro = datetime.now().strftime("%d/%m/%Y")
+    nuevo_socio = gc.Socio(id_socio, nombre, dni, direccion, fecha_nac, telefono, email, fecha_registro, talle, peso, objetivo)
+    socios_creados.append(nuevo_socio)
     
     messagebox.showinfo("Registro Exitoso", f"Socio {nombre} registrado correctamente.")
     
@@ -62,6 +73,50 @@ def registrar_nuevo_socio():
         entry.delete(0, tk.END)
     
     ocultar_formulario_alta()
+    actualizar_vista_socios()
+
+def borrar_socio_seleccionado():
+    """Borra el socio seleccionado en la tabla Treeview."""
+    selected_item = tree_socios.focus()
+    if not selected_item:
+        messagebox.showerror("Error", "Por favor, seleccione un socio para borrar.")
+        return
+
+    if not messagebox.askyesno("Confirmar Borrado", "¿Está seguro de que desea borrar el socio seleccionado?"):
+        return
+
+    item_values = tree_socios.item(selected_item, 'values')
+    id_a_borrar = int(item_values[0])
+
+    socio_a_borrar = next((s for s in socios_creados if s.id_socio == id_a_borrar), None)
+    
+    if socio_a_borrar:
+        socios_creados.remove(socio_a_borrar)
+        messagebox.showinfo("Éxito", f"Socio '{socio_a_borrar.nombre_apellido}' borrado correctamente.")
+        actualizar_vista_socios()
+
+def buscar_socios():
+    """Filtra la tabla de socios según el término de búsqueda."""
+    termino_busqueda = entry_buscar_socio.get().lower()
+
+    # Limpiar la tabla antes de mostrar los resultados
+    for item in tree_socios.get_children():
+        tree_socios.delete(item)
+
+    # Si no hay término de búsqueda, mostrar todos y salir
+    if not termino_busqueda:
+        actualizar_vista_socios()
+        return
+
+    # Filtrar y mostrar resultados
+    resultados_encontrados = []
+    for socio in socios_creados:
+        # Convertimos todos los valores a string y minúsculas para una búsqueda flexible
+        if termino_busqueda in str(socio.id_socio).lower() or \
+           termino_busqueda in str(socio.nombre_apellido).lower() or \
+           termino_busqueda in str(socio.dni).lower() or \
+           termino_busqueda in str(socio.telefono).lower():
+            tree_socios.insert("", tk.END, values=(socio.id_socio, socio.nombre_apellido, socio.dni, socio.telefono))
 
 # --- Formulario de Registro de Socios ---
 # Se crea el frame del formulario pero no se muestra inicialmente (sin .pack())
@@ -84,6 +139,32 @@ for i, label_text in enumerate(labels):
 
 # Configurar la columna de los campos de entrada para que se expanda
 form_frame.columnconfigure(1, weight=1)
+
+# --- Vista de Socios Registrados ---
+vista_socios_frame = ttk.LabelFrame(socio_frame, text="Socios Registrados", padding=(10, 5))
+vista_socios_frame.pack(padx=10, pady=10, fill="both", expand=True)
+
+# --- Widget de Búsqueda ---
+search_frame = ttk.Frame(vista_socios_frame)
+search_frame.pack(fill='x', padx=5, pady=5)
+
+entry_buscar_socio = ttk.Entry(search_frame)
+entry_buscar_socio.pack(side='left', fill='x', expand=True)
+
+btn_buscar_socio = ttk.Button(search_frame, text="Buscar 🔎", command=buscar_socios)
+btn_buscar_socio.pack(side='right', padx=(5, 0))
+
+columns_socios = ('id', 'nombre', 'dni', 'telefono')
+tree_socios = ttk.Treeview(vista_socios_frame, columns=columns_socios, show='headings')
+tree_socios.heading('id', text='ID')
+tree_socios.heading('nombre', text='Nombre y Apellido')
+tree_socios.heading('dni', text='DNI')
+tree_socios.heading('telefono', text='Teléfono')
+tree_socios.column('id', width=50, anchor=tk.CENTER)
+tree_socios.pack(fill="both", expand=True)
+
+btn_borrar_socio = ttk.Button(vista_socios_frame, text="Borrar Socio Seleccionado", command=borrar_socio_seleccionado)
+btn_borrar_socio.pack(pady=5)
 
 # --- Botones ---
 # Botón principal para mostrar el formulario
@@ -144,6 +225,47 @@ def guardar_nuevo_instructor():
     ocultar_form_alta_instructor()
     actualizar_vista_instructores()
 
+def borrar_instructor_seleccionado():
+    """Borra el instructor seleccionado en la tabla Treeview."""
+    selected_item = tree_instructores.focus()
+    if not selected_item:
+        messagebox.showerror("Error", "Por favor, seleccione un instructor para borrar.")
+        return
+
+    if not messagebox.askyesno("Confirmar Borrado", "¿Está seguro de que desea borrar el instructor seleccionado?"):
+        return
+
+    item_values = tree_instructores.item(selected_item, 'values')
+    id_a_borrar = int(item_values[0])
+
+    instructor_a_borrar = next((inst for inst in instructores_creados if inst.id_instructor == id_a_borrar), None)
+    
+    if instructor_a_borrar:
+        instructores_creados.remove(instructor_a_borrar)
+        messagebox.showinfo("Éxito", f"Instructor '{instructor_a_borrar.nombre}' borrado correctamente.")
+        actualizar_vista_instructores()
+        actualizar_comboboxes_asignacion() # Actualiza el combo en la pestaña Clases
+
+def buscar_instructores():
+    """Filtra la tabla de instructores según el término de búsqueda."""
+    termino_busqueda = entry_buscar_instructor.get().lower()
+
+    for item in tree_instructores.get_children():
+        tree_instructores.delete(item)
+
+    if not termino_busqueda:
+        actualizar_vista_instructores()
+        return
+
+    for inst in instructores_creados:
+        if termino_busqueda in str(inst.id_instructor).lower() or \
+           termino_busqueda in str(inst.nombre).lower() or \
+           termino_busqueda in str(inst.telefono).lower() or \
+           termino_busqueda in str(inst.sueldo).lower():
+            tree_instructores.insert("", tk.END, values=(inst.id_instructor, inst.nombre, inst.telefono, inst.sueldo))
+
+
+
 # --- Botón y Formulario de Alta de Instructores ---
 btn_alta_instructor = ttk.Button(instructor_frame, text="Alta Instructor", command=mostrar_form_alta_instructor)
 btn_alta_instructor.pack(pady=10)
@@ -169,6 +291,16 @@ btn_cancelar_instructor.grid(row=5, column=0, columnspan=2, pady=5)
 vista_instructores_frame = ttk.LabelFrame(instructor_frame, text="Instructores Registrados", padding=(10, 5))
 vista_instructores_frame.pack(padx=10, pady=10, fill="both", expand=True)
 
+search_frame_inst = ttk.Frame(vista_instructores_frame)
+search_frame_inst.pack(fill='x', padx=5, pady=5)
+
+entry_buscar_instructor = ttk.Entry(search_frame_inst)
+entry_buscar_instructor.pack(side='left', fill='x', expand=True)
+
+btn_buscar_instructor = ttk.Button(search_frame_inst, text="Buscar 🔎", command=buscar_instructores)
+btn_buscar_instructor.pack(side='right', padx=(5, 0))
+
+
 columns_inst = ('id', 'nombre', 'telefono', 'sueldo')
 tree_instructores = ttk.Treeview(vista_instructores_frame, columns=columns_inst, show='headings')
 tree_instructores.heading('id', text='ID')
@@ -177,6 +309,9 @@ tree_instructores.heading('telefono', text='Teléfono')
 tree_instructores.heading('sueldo', text='Sueldo')
 tree_instructores.column('id', width=50, anchor=tk.CENTER)
 tree_instructores.pack(fill="both", expand=True)
+
+btn_borrar_instructor = ttk.Button(vista_instructores_frame, text="Borrar Instructor Seleccionado", command=borrar_instructor_seleccionado)
+btn_borrar_instructor.pack(pady=5)
 
 # --- Pestaña Clases ---
 clases_frame = ttk.Frame(principal)
@@ -247,6 +382,46 @@ def asignar_instructor_a_clase():
     else:
         messagebox.showerror("Error", "No se encontró la clase o el instructor.")
 
+def borrar_clase_seleccionada():
+    """Borra la clase seleccionada en la tabla Treeview."""
+    selected_item = tree_clases.focus()
+    if not selected_item:
+        messagebox.showerror("Error", "Por favor, seleccione una clase para borrar.")
+        return
+
+    if not messagebox.askyesno("Confirmar Borrado", "¿Está seguro de que desea borrar la clase seleccionada?"):
+        return
+
+    item_values = tree_clases.item(selected_item, 'values')
+    id_a_borrar = int(item_values[0])
+
+    clase_a_borrar = next((c for c in clases_creadas if c.id_clase == id_a_borrar), None)
+    
+    if clase_a_borrar:
+        clases_creadas.remove(clase_a_borrar)
+        messagebox.showinfo("Éxito", f"Clase '{clase_a_borrar.tipo}' borrada correctamente.")
+        actualizar_vista_clases()
+        actualizar_comboboxes_asignacion()
+
+def buscar_clases():
+    """Filtra la tabla de clases según el término de búsqueda."""
+    termino_busqueda = entry_buscar_clase.get().lower()
+
+    for item in tree_clases.get_children():
+        tree_clases.delete(item)
+
+    if not termino_busqueda:
+        actualizar_vista_clases()
+        return
+
+    for c in clases_creadas:
+        instructor_nombre = c.instructor.nombre if hasattr(c, 'instructor') else ""
+        if termino_busqueda in str(c.id_clase).lower() or \
+           termino_busqueda in str(c.tipo).lower() or \
+           termino_busqueda in str(c.capacidad).lower() or \
+           termino_busqueda in instructor_nombre.lower():
+            tree_clases.insert("", tk.END, values=(c.id_clase, c.tipo, c.capacidad, instructor_nombre))
+
 # --- Widgets de la Pestaña Clases ---
 btn_crear_clase = ttk.Button(clases_frame, text="Crear Nueva Clase", command=mostrar_form_crear_clase)
 btn_crear_clase.pack(pady=10)
@@ -267,6 +442,15 @@ btn_cancelar_clase = ttk.Button(form_crear_clase_frame, text="Cancelar", command
 vista_clases_frame = ttk.LabelFrame(clases_frame, text="Clases Disponibles", padding=(10, 5))
 vista_clases_frame.pack(padx=10, pady=10, fill="both", expand=True)
 
+search_frame_clases = ttk.Frame(vista_clases_frame)
+search_frame_clases.pack(fill='x', padx=5, pady=5)
+
+entry_buscar_clase = ttk.Entry(search_frame_clases)
+entry_buscar_clase.pack(side='left', fill='x', expand=True)
+
+btn_buscar_clase = ttk.Button(search_frame_clases, text="Buscar 🔎", command=buscar_clases)
+btn_buscar_clase.pack(side='right', padx=(5, 0))
+
 columns_clases = ('id', 'tipo', 'capacidad', 'instructor')
 tree_clases = ttk.Treeview(vista_clases_frame, columns=columns_clases, show='headings')
 tree_clases.heading('id', text='ID')
@@ -275,6 +459,9 @@ tree_clases.heading('capacidad', text='Capacidad')
 tree_clases.heading('instructor', text='Instructor Asignado')
 tree_clases.column('id', width=50, anchor=tk.CENTER)
 tree_clases.pack(fill="both", expand=True)
+
+btn_borrar_clase = ttk.Button(vista_clases_frame, text="Borrar Clase Seleccionada", command=borrar_clase_seleccionada)
+btn_borrar_clase.pack(pady=5)
 
 form_asignar_frame = ttk.LabelFrame(clases_frame, text="Asignar Instructor y Horario", padding=(20, 10))
 form_asignar_frame.pack(padx=10, pady=10, fill="x")
@@ -340,6 +527,45 @@ def guardar_nuevo_horario():
     entry_horario_fin.delete(0, tk.END)
     ocultar_form_crear_horario()
     actualizar_vista_horarios()
+    actualizar_comboboxes_asignacion() # Actualiza el combo en la pestaña Clases
+
+def borrar_horario_seleccionado():
+    """Borra el horario seleccionado en la tabla Treeview."""
+    selected_item = tree_horarios.focus()
+    if not selected_item:
+        messagebox.showerror("Error", "Por favor, seleccione un horario para borrar.")
+        return
+
+    if not messagebox.askyesno("Confirmar Borrado", "¿Está seguro de que desea borrar el horario seleccionado?"):
+        return
+
+    item_values = tree_horarios.item(selected_item, 'values')
+    id_a_borrar = int(item_values[0])
+
+    horario_a_borrar = next((h for h in horarios_creados if h.id_dias == id_a_borrar), None)
+    
+    if horario_a_borrar:
+        horarios_creados.remove(horario_a_borrar)
+        messagebox.showinfo("Éxito", "Horario borrado correctamente.")
+        actualizar_vista_horarios()
+
+def buscar_horarios():
+    """Filtra la tabla de horarios según el término de búsqueda."""
+    termino_busqueda = entry_buscar_horario.get().lower()
+
+    for item in tree_horarios.get_children():
+        tree_horarios.delete(item)
+
+    if not termino_busqueda:
+        actualizar_vista_horarios()
+        return
+
+    for h in horarios_creados:
+        if termino_busqueda in str(h.id_dias).lower() or \
+           termino_busqueda in str(h.dia_semana).lower() or \
+           termino_busqueda in str(h.hora_inicio).lower() or \
+           termino_busqueda in str(h.hora_final).lower():
+            tree_horarios.insert("", tk.END, values=(h.id_dias, h.dia_semana, h.hora_inicio, h.hora_final))
 
 # --- Botón y Formulario de Creación de Horarios ---
 btn_crear_horario = ttk.Button(horarios_frame, text="Crear Nuevo Horario", command=mostrar_form_crear_horario)
@@ -365,6 +591,15 @@ btn_cancelar_horario.grid(row=4, column=0, columnspan=2, pady=5)
 vista_horarios_frame = ttk.LabelFrame(horarios_frame, text="Horarios Programados", padding=(10, 5))
 vista_horarios_frame.pack(padx=10, pady=10, fill="both", expand=True)
 
+search_frame_horarios = ttk.Frame(vista_horarios_frame)
+search_frame_horarios.pack(fill='x', padx=5, pady=5)
+
+entry_buscar_horario = ttk.Entry(search_frame_horarios)
+entry_buscar_horario.pack(side='left', fill='x', expand=True)
+
+btn_buscar_horario = ttk.Button(search_frame_horarios, text="Buscar 🔎", command=buscar_horarios)
+btn_buscar_horario.pack(side='right', padx=(5, 0))
+
 columns = ('id', 'dia', 'inicio', 'fin')
 tree_horarios = ttk.Treeview(vista_horarios_frame, columns=columns, show='headings')
 tree_horarios.heading('id', text='ID')
@@ -374,30 +609,39 @@ tree_horarios.heading('fin', text='Hora Fin')
 tree_horarios.column('id', width=50, anchor=tk.CENTER)
 tree_horarios.pack(fill="both", expand=True)
 
+btn_borrar_horario = ttk.Button(vista_horarios_frame, text="Borrar Horario Seleccionado", command=borrar_horario_seleccionado)
+btn_borrar_horario.pack(pady=5)
+
 # --- Pestaña Equipamiento ---
 equipamiento_frame = ttk.Frame(principal)
 principal.add(equipamiento_frame, text="equipamiento")
 
 equipos_creados = []
 
-def actualizar_combobox_equipos():
-    """Actualiza la lista de equipos en el Combobox de gestión."""
+def actualizar_vista_equipos():
+    """Limpia y actualiza la tabla de equipos."""
+    for item in tree_equipos.get_children():
+        tree_equipos.delete(item)
+    for eq in equipos_creados:
+        tree_equipos.insert("", tk.END, values=(eq.id_equipamiento, eq.tipo_maquina, eq.musculos, eq.estado))
+    
+    # También actualiza el combo de la pestaña rutina si es necesario
+    # (Aunque no se usa directamente, es buena práctica mantenerlo)
     nombres_equipos = [f"ID {e.id_equipamiento}: {e.tipo_maquina}" for e in equipos_creados]
-    combo_equipos_gestion['values'] = nombres_equipos
-    if nombres_equipos:
-        combo_equipos_gestion.current(0)
+    # combo_equipos_gestion['values'] = nombres_equipos
+
 
 def mostrar_form_agregar_equipo():
     """Muestra el formulario para agregar un nuevo equipo."""
     btn_agregar_equipo.pack_forget()
     form_agregar_equipo_frame.pack(padx=10, pady=10, fill="x")
-    form_gestionar_equipo_frame.pack_forget()
+    vista_equipos_frame.pack_forget()
 
 def ocultar_form_agregar_equipo():
     """Oculta el formulario de agregación y muestra los otros widgets."""
     form_agregar_equipo_frame.pack_forget()
     btn_agregar_equipo.pack(pady=10)
-    form_gestionar_equipo_frame.pack(padx=10, pady=10, fill="x", expand=True)
+    vista_equipos_frame.pack(padx=10, pady=10, fill="both", expand=True)
 
 def guardar_nuevo_equipo():
     """Crea un nuevo objeto equipamiento y lo guarda."""
@@ -420,7 +664,7 @@ def guardar_nuevo_equipo():
     for entry in [entry_equipo_tipo, entry_equipo_capacidad, entry_equipo_musculos]:
         entry.delete(0, tk.END)
     ocultar_form_agregar_equipo()
-    actualizar_combobox_equipos()
+    actualizar_vista_equipos()
 
 def actualizar_estado_equipo():
     """Actualiza el estado (habilita/deshabilita) de un equipo seleccionado."""
@@ -440,6 +684,44 @@ def actualizar_estado_equipo():
         print(f"Equipo ID {equipo_encontrado.id_equipamiento} actualizado. Nuevo estado: {equipo_encontrado.estado}")
     else:
         messagebox.showerror("Error", "No se encontró el equipo seleccionado.")
+
+def borrar_equipo_seleccionado():
+    """Borra el equipo seleccionado en la tabla Treeview."""
+    selected_item = tree_equipos.focus()
+    if not selected_item:
+        messagebox.showerror("Error", "Por favor, seleccione un equipo para borrar.")
+        return
+
+    if not messagebox.askyesno("Confirmar Borrado", "¿Está seguro de que desea borrar el equipo seleccionado?"):
+        return
+
+    item_values = tree_equipos.item(selected_item, 'values')
+    id_a_borrar = int(item_values[0])
+
+    equipo_a_borrar = next((eq for eq in equipos_creados if eq.id_equipamiento == id_a_borrar), None)
+    
+    if equipo_a_borrar:
+        equipos_creados.remove(equipo_a_borrar)
+        messagebox.showinfo("Éxito", f"Equipo '{equipo_a_borrar.tipo_maquina}' borrado correctamente.")
+        actualizar_vista_equipos()
+
+def buscar_equipos():
+    """Filtra la tabla de equipos según el término de búsqueda."""
+    termino_busqueda = entry_buscar_equipo.get().lower()
+
+    for item in tree_equipos.get_children():
+        tree_equipos.delete(item)
+
+    if not termino_busqueda:
+        actualizar_vista_equipos()
+        return
+
+    for eq in equipos_creados:
+        if termino_busqueda in str(eq.id_equipamiento).lower() or \
+           termino_busqueda in str(eq.tipo_maquina).lower() or \
+           termino_busqueda in str(eq.musculos).lower() or \
+           termino_busqueda in str(eq.estado).lower():
+            tree_equipos.insert("", tk.END, values=(eq.id_equipamiento, eq.tipo_maquina, eq.musculos, eq.estado))
 
 # --- Botón principal y formularios de Equipamiento ---
 btn_agregar_equipo = ttk.Button(equipamiento_frame, text="Agregar Equipamiento", command=mostrar_form_agregar_equipo)
@@ -462,19 +744,30 @@ btn_guardar_equipo.grid(row=4, column=0, columnspan=2, pady=10)
 btn_cancelar_equipo = ttk.Button(form_agregar_equipo_frame, text="Cancelar", command=ocultar_form_agregar_equipo)
 btn_cancelar_equipo.grid(row=5, column=0, columnspan=2, pady=5)
 
-form_gestionar_equipo_frame = ttk.LabelFrame(equipamiento_frame, text="Gestionar Equipamiento", padding=(20, 10))
-form_gestionar_equipo_frame.pack(padx=10, pady=10, fill="x", expand=True)
+# --- Vista de Equipos Registrados ---
+vista_equipos_frame = ttk.LabelFrame(equipamiento_frame, text="Equipos Registrados", padding=(10, 5))
+vista_equipos_frame.pack(padx=10, pady=10, fill="both", expand=True)
 
-ttk.Label(form_gestionar_equipo_frame, text="Seleccionar Equipo:").pack(pady=5)
-combo_equipos_gestion = ttk.Combobox(form_gestionar_equipo_frame, state="readonly")
-combo_equipos_gestion.pack(pady=5, fill="x")
+search_frame_equipos = ttk.Frame(vista_equipos_frame)
+search_frame_equipos.pack(fill='x', padx=5, pady=5)
 
-ttk.Label(form_gestionar_equipo_frame, text="Cambiar Estado a:").pack(pady=5)
-combo_estado_gestion = ttk.Combobox(form_gestionar_equipo_frame, values=["Habilitado", "Deshabilitado"], state="readonly")
-combo_estado_gestion.pack(pady=5, fill="x")
+entry_buscar_equipo = ttk.Entry(search_frame_equipos)
+entry_buscar_equipo.pack(side='left', fill='x', expand=True)
 
-btn_actualizar_estado = ttk.Button(form_gestionar_equipo_frame, text="Actualizar Estado", command=actualizar_estado_equipo)
-btn_actualizar_estado.pack(pady=10)
+btn_buscar_equipo = ttk.Button(search_frame_equipos, text="Buscar 🔎", command=buscar_equipos)
+btn_buscar_equipo.pack(side='right', padx=(5, 0))
+
+columns_equipos = ('id', 'tipo', 'musculos', 'estado')
+tree_equipos = ttk.Treeview(vista_equipos_frame, columns=columns_equipos, show='headings')
+tree_equipos.heading('id', text='ID')
+tree_equipos.heading('tipo', text='Tipo de Máquina')
+tree_equipos.heading('musculos', text='Músculos')
+tree_equipos.heading('estado', text='Estado')
+tree_equipos.column('id', width=50, anchor=tk.CENTER)
+tree_equipos.pack(fill="both", expand=True)
+
+btn_borrar_equipo = ttk.Button(vista_equipos_frame, text="Borrar Equipo Seleccionado", command=borrar_equipo_seleccionado)
+btn_borrar_equipo.pack(pady=5)
 
 # --- Pestaña Rutina ---
 rutina_frame = ttk.Frame(principal)
@@ -485,24 +778,28 @@ principal.add(rutina_frame, text="rutina")
 # Lista para almacenar las rutinas creadas (simulación en memoria)
 rutinas_creadas = []
 
-def actualizar_combobox_rutinas():
-    """Actualiza la lista de rutinas en el Combobox."""
-    nombres_rutinas = [f"ID {r.id_rutina}: {r.tipo}" for r in rutinas_creadas]
-    combo_rutinas['values'] = nombres_rutinas
-    if nombres_rutinas:
-        combo_rutinas.current(0)
+def actualizar_vista_rutinas():
+    """Limpia y actualiza la tabla de rutinas."""
+    for item in tree_rutinas.get_children():
+        tree_rutinas.delete(item)
+    for r in rutinas_creadas:
+        # Contar ejercicios para mostrar en la tabla
+        num_ejercicios = len(r.ejercicios)
+        tree_rutinas.insert("", tk.END, values=(r.id_rutina, r.tipo, r.duracion, num_ejercicios))
 
 def mostrar_form_crear_rutina():
     """Muestra el formulario para crear una nueva rutina."""
     btn_crear_rutina.pack_forget()
+    vista_rutinas_frame.pack_forget()
     form_crear_rutina_frame.pack(padx=10, pady=10, fill="x")
-    form_asignar_ejercicio_frame.pack_forget() # Ocultar el otro form
+    # form_asignar_ejercicio_frame.pack_forget() # Ocultar el otro form
 
 def ocultar_form_crear_rutina():
     """Oculta el formulario de creación de rutinas."""
     form_crear_rutina_frame.pack_forget()
     btn_crear_rutina.pack(pady=10)
-    form_asignar_ejercicio_frame.pack(padx=10, pady=10, fill="x", expand=True) # Volver a mostrar
+    vista_rutinas_frame.pack(padx=10, pady=10, fill="both", expand=True)
+    # form_asignar_ejercicio_frame.pack(padx=10, pady=10, fill="x", expand=True) # Volver a mostrar
 
 def guardar_nueva_rutina():
     """Crea un nuevo objeto rutina y lo guarda."""
@@ -531,7 +828,7 @@ def guardar_nueva_rutina():
     entry_rutina_duracion.delete(0, tk.END)
     entry_rutina_ejercicio.delete(0, tk.END)
     ocultar_form_crear_rutina()
-    actualizar_combobox_rutinas()
+    actualizar_vista_rutinas()
 
 def asignar_ejercicio_a_rutina():
     """Asigna un nuevo ejercicio a la rutina seleccionada en el Combobox."""
@@ -558,9 +855,48 @@ def asignar_ejercicio_a_rutina():
     else:
         messagebox.showerror("Error", "No se encontró la rutina seleccionada.")
 
+def borrar_rutina_seleccionada():
+    """Borra la rutina seleccionada en la tabla Treeview."""
+    selected_item = tree_rutinas.focus()
+    if not selected_item:
+        messagebox.showerror("Error", "Por favor, seleccione una rutina para borrar.")
+        return
+
+    if not messagebox.askyesno("Confirmar Borrado", "¿Está seguro de que desea borrar la rutina seleccionada?"):
+        return
+
+    item_values = tree_rutinas.item(selected_item, 'values')
+    id_a_borrar = int(item_values[0])
+
+    rutina_a_borrar = next((r for r in rutinas_creadas if r.id_rutina == id_a_borrar), None)
+    
+    if rutina_a_borrar:
+        rutinas_creadas.remove(rutina_a_borrar)
+        messagebox.showinfo("Éxito", f"Rutina '{rutina_a_borrar.tipo}' borrada correctamente.")
+        actualizar_vista_rutinas()
+
+def buscar_rutinas():
+    """Filtra la tabla de rutinas según el término de búsqueda."""
+    termino_busqueda = entry_buscar_rutina.get().lower()
+
+    for item in tree_rutinas.get_children():
+        tree_rutinas.delete(item)
+
+    if not termino_busqueda:
+        actualizar_vista_rutinas()
+        return
+
+    for r in rutinas_creadas:
+        if termino_busqueda in str(r.id_rutina).lower() or \
+           termino_busqueda in str(r.tipo).lower() or \
+           termino_busqueda in str(r.duracion).lower():
+            tree_rutinas.insert("", tk.END, values=(r.id_rutina, r.tipo, r.duracion, len(r.ejercicios)))
+
 # --- Botón principal para crear rutina ---
 btn_crear_rutina = ttk.Button(rutina_frame, text="Crear Rutina", command=mostrar_form_crear_rutina)
 btn_crear_rutina.pack(pady=10)
+
+
 
 # --- Formulario para Crear Rutina (inicialmente oculto) ---
 form_crear_rutina_frame = ttk.LabelFrame(rutina_frame, text="Crear Nueva Rutina", padding=(20, 10))
@@ -584,6 +920,31 @@ btn_guardar_rutina.grid(row=3, column=0, columnspan=2, pady=10)
 
 btn_cancelar_rutina = ttk.Button(form_crear_rutina_frame, text="Cancelar", command=ocultar_form_crear_rutina)
 btn_cancelar_rutina.grid(row=4, column=0, columnspan=2, pady=5)
+
+# --- Vista de Rutinas Creadas ---
+vista_rutinas_frame = ttk.LabelFrame(rutina_frame, text="Rutinas Creadas", padding=(10, 5))
+vista_rutinas_frame.pack(padx=10, pady=10, fill="both", expand=True)
+
+search_frame_rutinas = ttk.Frame(vista_rutinas_frame)
+search_frame_rutinas.pack(fill='x', padx=5, pady=5)
+
+entry_buscar_rutina = ttk.Entry(search_frame_rutinas)
+entry_buscar_rutina.pack(side='left', fill='x', expand=True)
+
+btn_buscar_rutina = ttk.Button(search_frame_rutinas, text="Buscar 🔎", command=buscar_rutinas)
+btn_buscar_rutina.pack(side='right', padx=(5, 0))
+
+columns_rutinas = ('id', 'tipo', 'duracion', 'num_ejercicios')
+tree_rutinas = ttk.Treeview(vista_rutinas_frame, columns=columns_rutinas, show='headings')
+tree_rutinas.heading('id', text='ID')
+tree_rutinas.heading('tipo', text='Tipo')
+tree_rutinas.heading('duracion', text='Duración')
+tree_rutinas.heading('num_ejercicios', text='N° Ejercicios')
+tree_rutinas.column('id', width=50, anchor=tk.CENTER)
+tree_rutinas.pack(fill="both", expand=True)
+
+btn_borrar_rutina = ttk.Button(vista_rutinas_frame, text="Borrar Rutina Seleccionada", command=borrar_rutina_seleccionada)
+btn_borrar_rutina.pack(pady=5)
 
 # --- Formulario para Asignar Ejercicio ---
 form_asignar_ejercicio_frame = ttk.LabelFrame(rutina_frame, text="Asignar Ejercicio a Rutina", padding=(20, 10))
@@ -645,6 +1006,46 @@ def guardar_nuevo_ejercicio():
     ocultar_form_crear_ejercicio()
     actualizar_vista_ejercicios()
 
+def borrar_ejercicio_seleccionado():
+    """Borra el ejercicio seleccionado en la tabla Treeview."""
+    selected_item = tree_ejercicios.focus()  # Obtiene el item seleccionado
+    if not selected_item:
+        messagebox.showerror("Error", "Por favor, seleccione un ejercicio para borrar.")
+        return
+
+    # Pedir confirmación al usuario
+    if not messagebox.askyesno("Confirmar Borrado", "¿Está seguro de que desea borrar el ejercicio seleccionado?"):
+        return
+
+    item_values = tree_ejercicios.item(selected_item, 'values')
+    id_ejercicio_a_borrar = int(item_values[0])
+
+    # Encontrar y eliminar el ejercicio de la lista de datos
+    ejercicio_a_borrar = next((ej for ej in ejercicios_creados if ej.id_ejercicio == id_ejercicio_a_borrar), None)
+    
+    if ejercicio_a_borrar:
+        ejercicios_creados.remove(ejercicio_a_borrar)
+        messagebox.showinfo("Éxito", f"Ejercicio '{ejercicio_a_borrar.nombre}' borrado correctamente.")
+        actualizar_vista_ejercicios()  # Actualiza la tabla para reflejar el cambio
+
+def buscar_ejercicios():
+    """Filtra la tabla de ejercicios según el término de búsqueda."""
+    termino_busqueda = entry_buscar_ejercicio.get().lower()
+
+    for item in tree_ejercicios.get_children():
+        tree_ejercicios.delete(item)
+
+    if not termino_busqueda:
+        actualizar_vista_ejercicios()
+        return
+
+    for ej in ejercicios_creados:
+        if termino_busqueda in str(ej.id_ejercicio).lower() or \
+           termino_busqueda in str(ej.nombre).lower() or \
+           termino_busqueda in str(ej.grupo_muscular).lower():
+            tree_ejercicios.insert("", tk.END, values=(ej.id_ejercicio, ej.nombre, ej.grupo_muscular, f"{ej.series}x{ej.repeticiones}", f"{ej.duracion_segundos} seg"))
+
+
 # --- Widgets de la Pestaña Ejercicios ---
 btn_crear_ejercicio = ttk.Button(ejercicio_frame, text="Crear Nuevo Ejercicio", command=mostrar_form_crear_ejercicio)
 btn_crear_ejercicio.pack(pady=10)
@@ -665,6 +1066,15 @@ ttk.Button(form_crear_ejercicio_frame, text="Cancelar", command=ocultar_form_cre
 vista_ejercicios_frame = ttk.LabelFrame(ejercicio_frame, text="Ejercicios Creados", padding=(10, 5))
 vista_ejercicios_frame.pack(padx=10, pady=10, fill="both", expand=True)
 
+search_frame_ejercicios = ttk.Frame(vista_ejercicios_frame)
+search_frame_ejercicios.pack(fill='x', padx=5, pady=5)
+
+entry_buscar_ejercicio = ttk.Entry(search_frame_ejercicios)
+entry_buscar_ejercicio.pack(side='left', fill='x', expand=True)
+
+btn_buscar_ejercicio = ttk.Button(search_frame_ejercicios, text="Buscar 🔎", command=buscar_ejercicios)
+btn_buscar_ejercicio.pack(side='right', padx=(5, 0))
+
 columns_ejercicios = ('id', 'nombre', 'grupo_muscular', 'series_reps', 'duracion')
 tree_ejercicios = ttk.Treeview(vista_ejercicios_frame, columns=columns_ejercicios, show='headings')
 tree_ejercicios.heading('id', text='ID')
@@ -676,6 +1086,9 @@ tree_ejercicios.column('id', width=50, anchor=tk.CENTER)
 tree_ejercicios.column('series_reps', width=50, anchor=tk.CENTER)
 tree_ejercicios.column('duracion', width=50, anchor=tk.CENTER)
 tree_ejercicios.pack(fill="both", expand=True)
+
+btn_borrar_ejercicio = ttk.Button(vista_ejercicios_frame, text="Borrar Ejercicio Seleccionado", command=borrar_ejercicio_seleccionado)
+btn_borrar_ejercicio.pack(pady=5)
 
 # --- Iniciar el bucle principal de la aplicación ---
 ventana_principal.mainloop()
