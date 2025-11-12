@@ -180,8 +180,11 @@ btn_cancelar = ttk.Button(socio_frame, text="Cancelar", command=ocultar_formular
 # --- Pestaña Instructor ---
 instructor_frame = ttk.Frame(principal)
 principal.add(instructor_frame, text="instructor")
-
 instructores_creados = []
+
+# --- Pestaña Clases ---
+clases_frame = ttk.Frame(principal)
+principal.add(clases_frame, text="clases")
 
 def actualizar_vista_instructores():
     """Limpia y actualiza la tabla de instructores."""
@@ -313,9 +316,9 @@ tree_instructores.pack(fill="both", expand=True)
 btn_borrar_instructor = ttk.Button(vista_instructores_frame, text="Borrar Instructor Seleccionado", command=borrar_instructor_seleccionado)
 btn_borrar_instructor.pack(pady=5)
 
-# --- Pestaña Clases ---
-clases_frame = ttk.Frame(principal)
-principal.add(clases_frame, text="clases")
+# --- Pestaña Horarios ---
+horarios_frame = ttk.Frame(principal)
+principal.add(horarios_frame, text="horarios")
 
 clases_creadas = []
 
@@ -480,10 +483,6 @@ combo_asignar_horario.pack(pady=2, fill="x")
 
 btn_asignar = ttk.Button(form_asignar_frame, text="Asignar", command=asignar_instructor_a_clase)
 btn_asignar.pack(pady=10)
-
-# --- Pestaña Horarios ---
-horarios_frame = ttk.Frame(principal)
-principal.add(horarios_frame, text="horarios")
 
 horarios_creados = []
 
@@ -773,9 +772,6 @@ btn_borrar_equipo.pack(pady=5)
 rutina_frame = ttk.Frame(principal)
 principal.add(rutina_frame, text="rutina")
 
-# --- Pestaña Rutina ---
-
-# Lista para almacenar las rutinas creadas (simulación en memoria)
 rutinas_creadas = []
 
 def actualizar_vista_rutinas():
