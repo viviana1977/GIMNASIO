@@ -3,6 +3,7 @@ from tkinter import ttk
 from tkinter import *
 from datetime import datetime
 from tkinter import messagebox
+from vista_clases import VistaClases
 from vista_instructor import VistaInstructor
 from vista_socio import VistaSocio
 
@@ -23,6 +24,8 @@ instructor_frame = VistaInstructor(principal)
 
 #############################################
 # --- Pestaña Clases ---
+clases_frame_2 = VistaClases(principal)
+
 clases_frame = ttk.Frame(principal)
 principal.add(clases_frame, text="clases")
 
