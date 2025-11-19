@@ -3,6 +3,7 @@ from tkinter import ttk
 from tkinter import *
 from datetime import datetime
 from tkinter import messagebox
+from vista_instructor import VistaInstructor
 from vista_socio import VistaSocio
 
 import gimnasio_modelo as gc
@@ -17,150 +18,13 @@ principal.pack(fill='both', expand=True, padx=10, pady=10)
 # --- Pestaña Socios ---
 socio_frame = VistaSocio(principal)
 
-# --- Otras Pestañas ---
-
 # --- Pestaña Instructor ---
-instructor_frame = ttk.Frame(principal)
-principal.add(instructor_frame, text="instructor")
-instructores_creados = []
+instructor_frame = VistaInstructor(principal)
 
+#############################################
 # --- Pestaña Clases ---
 clases_frame = ttk.Frame(principal)
 principal.add(clases_frame, text="clases")
-
-def actualizar_vista_instructores():
-    """Limpia y actualiza la tabla de instructores."""
-    for item in tree_instructores.get_children():
-        tree_instructores.delete(item)
-    for inst in instructores_creados:
-        tree_instructores.insert("", tk.END, values=(inst.id_instructor, inst.nombre, inst.telefono, inst.sueldo))
-
-def mostrar_form_alta_instructor():
-    """Muestra el formulario para dar de alta un instructor."""
-    btn_alta_instructor.pack_forget()
-    vista_instructores_frame.pack_forget()
-    form_alta_instructor_frame.pack(padx=10, pady=10, fill="x")
-
-def ocultar_form_alta_instructor():
-    """Oculta el formulario de alta y muestra la vista principal."""
-    form_alta_instructor_frame.pack_forget()
-    btn_alta_instructor.pack(pady=10)
-    vista_instructores_frame.pack(padx=10, pady=10, fill="both", expand=True)
-
-def guardar_nuevo_instructor():
-    """Guarda un nuevo instructor y actualiza la vista."""
-    nombre = entry_instructor_nombre.get()
-    direccion = entry_instructor_direccion.get()
-    telefono = entry_instructor_telefono.get()
-    sueldo = entry_instructor_sueldo.get()
-
-    if not all([nombre, direccion, telefono, sueldo]):
-        messagebox.showerror("Error", "Todos los campos son obligatorios.")
-        return
-
-    id_instructor = len(instructores_creados) + 1
-    nuevo_instructor = gc.instructor(id_instructor, nombre, direccion, telefono, sueldo)
-    instructores_creados.append(nuevo_instructor)
-
-    messagebox.showinfo("Éxito", f"Instructor {nombre} registrado correctamente.")
-    print(f"Nuevo instructor registrado: ID={nuevo_instructor.id_instructor}, Nombre={nuevo_instructor.nombre}")
-
-    for entry in [entry_instructor_nombre, entry_instructor_direccion, entry_instructor_telefono, entry_instructor_sueldo]:
-        entry.delete(0, tk.END)
-    ocultar_form_alta_instructor()
-    actualizar_vista_instructores()
-
-def borrar_instructor_seleccionado():
-    """Borra el instructor seleccionado en la tabla Treeview."""
-    selected_item = tree_instructores.focus()
-    if not selected_item:
-        messagebox.showerror("Error", "Por favor, seleccione un instructor para borrar.")
-        return
-
-    if not messagebox.askyesno("Confirmar Borrado", "¿Está seguro de que desea borrar el instructor seleccionado?"):
-        return
-
-    item_values = tree_instructores.item(selected_item, 'values')
-    id_a_borrar = int(item_values[0])
-
-    instructor_a_borrar = next((inst for inst in instructores_creados if inst.id_instructor == id_a_borrar), None)
-    
-    if instructor_a_borrar:
-        instructores_creados.remove(instructor_a_borrar)
-        messagebox.showinfo("Éxito", f"Instructor '{instructor_a_borrar.nombre}' borrado correctamente.")
-        actualizar_vista_instructores()
-        actualizar_comboboxes_asignacion() # Actualiza el combo en la pestaña Clases
-
-def buscar_instructores():
-    """Filtra la tabla de instructores según el término de búsqueda."""
-    termino_busqueda = entry_buscar_instructor.get().lower()
-
-    for item in tree_instructores.get_children():
-        tree_instructores.delete(item)
-
-    if not termino_busqueda:
-        actualizar_vista_instructores()
-        return
-
-    for inst in instructores_creados:
-        if termino_busqueda in str(inst.id_instructor).lower() or \
-           termino_busqueda in str(inst.nombre).lower() or \
-           termino_busqueda in str(inst.telefono).lower() or \
-           termino_busqueda in str(inst.sueldo).lower():
-            tree_instructores.insert("", tk.END, values=(inst.id_instructor, inst.nombre, inst.telefono, inst.sueldo))
-
-
-
-# --- Botón y Formulario de Alta de Instructores ---
-btn_alta_instructor = ttk.Button(instructor_frame, text="Alta Instructor", command=mostrar_form_alta_instructor)
-btn_alta_instructor.pack(pady=10)
-
-form_alta_instructor_frame = ttk.LabelFrame(instructor_frame, text="Registrar Nuevo Instructor", padding=(20, 10))
-labels_instructor = {"Nombre:": 0, "Dirección:": 1, "Teléfono:": 2, "Sueldo:": 3}
-entry_instructor_nombre = ttk.Entry(form_alta_instructor_frame)
-entry_instructor_direccion = ttk.Entry(form_alta_instructor_frame)
-entry_instructor_telefono = ttk.Entry(form_alta_instructor_frame)
-entry_instructor_sueldo = ttk.Entry(form_alta_instructor_frame)
-
-for i, (text, widget) in enumerate(zip(labels_instructor.keys(), [entry_instructor_nombre, entry_instructor_direccion, entry_instructor_telefono, entry_instructor_sueldo])):
-    ttk.Label(form_alta_instructor_frame, text=text).grid(row=i, column=0, padx=5, pady=5, sticky="w")
-    widget.grid(row=i, column=1, padx=5, pady=5, sticky="ew")
-
-form_alta_instructor_frame.columnconfigure(1, weight=1)
-btn_guardar_instructor = ttk.Button(form_alta_instructor_frame, text="Guardar Instructor", command=guardar_nuevo_instructor)
-btn_guardar_instructor.grid(row=4, column=0, columnspan=2, pady=10)
-btn_cancelar_instructor = ttk.Button(form_alta_instructor_frame, text="Cancelar", command=ocultar_form_alta_instructor)
-btn_cancelar_instructor.grid(row=5, column=0, columnspan=2, pady=5)
-
-# --- Vista de Instructores Registrados ---
-vista_instructores_frame = ttk.LabelFrame(instructor_frame, text="Instructores Registrados", padding=(10, 5))
-vista_instructores_frame.pack(padx=10, pady=10, fill="both", expand=True)
-
-search_frame_inst = ttk.Frame(vista_instructores_frame)
-search_frame_inst.pack(fill='x', padx=5, pady=5)
-
-entry_buscar_instructor = ttk.Entry(search_frame_inst)
-entry_buscar_instructor.pack(side='left', fill='x', expand=True)
-
-btn_buscar_instructor = ttk.Button(search_frame_inst, text="Buscar 🔎", command=buscar_instructores)
-btn_buscar_instructor.pack(side='right', padx=(5, 0))
-
-
-columns_inst = ('id', 'nombre', 'telefono', 'sueldo')
-tree_instructores = ttk.Treeview(vista_instructores_frame, columns=columns_inst, show='headings')
-tree_instructores.heading('id', text='ID')
-tree_instructores.heading('nombre', text='Nombre')
-tree_instructores.heading('telefono', text='Teléfono')
-tree_instructores.heading('sueldo', text='Sueldo')
-tree_instructores.column('id', width=50, anchor=tk.CENTER)
-tree_instructores.pack(fill="both", expand=True)
-
-btn_borrar_instructor = ttk.Button(vista_instructores_frame, text="Borrar Instructor Seleccionado", command=borrar_instructor_seleccionado)
-btn_borrar_instructor.pack(pady=5)
-
-# --- Pestaña Horarios ---
-horarios_frame = ttk.Frame(principal)
-principal.add(horarios_frame, text="horarios")
 
 clases_creadas = []
 
@@ -325,6 +189,12 @@ combo_asignar_horario.pack(pady=2, fill="x")
 
 btn_asignar = ttk.Button(form_asignar_frame, text="Asignar", command=asignar_instructor_a_clase)
 btn_asignar.pack(pady=10)
+
+#################################
+
+# --- Pestaña Horarios ---
+horarios_frame = ttk.Frame(principal)
+principal.add(horarios_frame, text="horarios")
 
 horarios_creados = []
 
