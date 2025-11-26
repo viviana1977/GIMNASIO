@@ -6,13 +6,14 @@ from tkinter import messagebox
 from vista_clases import VistaClases
 from vista_instructor import VistaInstructor
 from vista_socio import VistaSocio
+from vista_ejercicio import VistaEjercicio
 
 import gimnasio_modelo as gc
 
 ventana_principal = tk.Tk()
 ventana_principal.title("GIMNASIO")
 ventana_principal.geometry("800x600")
-ventana_principal.resizable(0,0)
+#ventana_principal.resizable(0,0)
 principal = ttk.Notebook(ventana_principal)
 principal.pack(fill='both', expand=True, padx=10, pady=10)
 
@@ -657,149 +658,6 @@ tree_rutinas.pack(fill="both", expand=True)
 btn_borrar_rutina = ttk.Button(vista_rutinas_frame, text="Borrar Rutina Seleccionada", command=borrar_rutina_seleccionada)
 btn_borrar_rutina.pack(pady=5)
 
-# --- Formulario para Asignar Ejercicio ---
-form_asignar_ejercicio_frame = ttk.LabelFrame(rutina_frame, text="Asignar Ejercicio a Rutina", padding=(20, 10))
-form_asignar_ejercicio_frame.pack(padx=10, pady=10, fill="x", expand=True)
-
-ttk.Label(form_asignar_ejercicio_frame, text="Seleccionar Rutina:").pack(pady=5)
-combo_rutinas = ttk.Combobox(form_asignar_ejercicio_frame, state="readonly")
-combo_rutinas.pack(pady=5, fill="x")
-
-ttk.Label(form_asignar_ejercicio_frame, text="Nuevo Ejercicio:").pack(pady=5)
-entry_nuevo_ejercicio = ttk.Entry(form_asignar_ejercicio_frame)
-entry_nuevo_ejercicio.pack(pady=5, fill="x")
-
-btn_asignar_ejercicio = ttk.Button(form_asignar_ejercicio_frame, text="Asignar Ejercicio", command=asignar_ejercicio_a_rutina)
-btn_asignar_ejercicio.pack(pady=10)
-
-# --- Pestaña Ejercicios ---
-ejercicio_frame = ttk.Frame(principal)
-principal.add(ejercicio_frame, text="ejercicios")
-
-ejercicios_creados = []
-
-def actualizar_vista_ejercicios():
-    """Limpia y actualiza la tabla de ejercicios."""
-    for item in tree_ejercicios.get_children():
-        tree_ejercicios.delete(item)
-    for ej in ejercicios_creados:
-        tree_ejercicios.insert("", tk.END, values=(ej.id_ejercicio, ej.nombre, ej.grupo_muscular, f"{ej.series}x{ej.repeticiones}", f"{ej.duracion_segundos} seg"))
-
-def mostrar_form_crear_ejercicio():
-    btn_crear_ejercicio.pack_forget()
-    vista_ejercicios_frame.pack_forget()
-    form_crear_ejercicio_frame.pack(padx=10, pady=10, fill="x")
-
-def ocultar_form_crear_ejercicio():
-    form_crear_ejercicio_frame.pack_forget()
-    btn_crear_ejercicio.pack(pady=10)
-    vista_ejercicios_frame.pack(padx=10, pady=10, fill="both", expand=True)
-
-def guardar_nuevo_ejercicio():
-    nombre = entry_ejercicio_nombre.get()
-    descripcion = entry_ejercicio_desc.get()
-    grupo_muscular = entry_ejercicio_musculo.get()
-    repeticiones = entry_ejercicio_rep.get()
-    series = entry_ejercicio_series.get()
-    duracion = entry_ejercicio_duracion.get()
-
-    if not all([nombre, grupo_muscular, repeticiones, series, duracion]):
-        messagebox.showerror("Error", "Los campos Nombre, Grupo Muscular, Repeticiones, Series y Duración son obligatorios.")
-        return
-
-    id_ejercicio = len(ejercicios_creados) + 1
-    nuevo_ejercicio = gc.ejercicio(id_ejercicio, nombre, descripcion, grupo_muscular, repeticiones, series, duracion)
-    ejercicios_creados.append(nuevo_ejercicio)
-
-    messagebox.showinfo("Éxito", f"Ejercicio '{nombre}' creado correctamente.")
-    for entry in [entry_ejercicio_nombre, entry_ejercicio_desc, entry_ejercicio_musculo, entry_ejercicio_rep, entry_ejercicio_series, entry_ejercicio_duracion]:
-        entry.delete(0, tk.END)
-    ocultar_form_crear_ejercicio()
-    actualizar_vista_ejercicios()
-
-def borrar_ejercicio_seleccionado():
-    """Borra el ejercicio seleccionado en la tabla Treeview."""
-    selected_item = tree_ejercicios.focus()  # Obtiene el item seleccionado
-    if not selected_item:
-        messagebox.showerror("Error", "Por favor, seleccione un ejercicio para borrar.")
-        return
-
-    # Pedir confirmación al usuario
-    if not messagebox.askyesno("Confirmar Borrado", "¿Está seguro de que desea borrar el ejercicio seleccionado?"):
-        return
-
-    item_values = tree_ejercicios.item(selected_item, 'values')
-    id_ejercicio_a_borrar = int(item_values[0])
-
-    # Encontrar y eliminar el ejercicio de la lista de datos
-    ejercicio_a_borrar = next((ej for ej in ejercicios_creados if ej.id_ejercicio == id_ejercicio_a_borrar), None)
-    
-    if ejercicio_a_borrar:
-        ejercicios_creados.remove(ejercicio_a_borrar)
-        messagebox.showinfo("Éxito", f"Ejercicio '{ejercicio_a_borrar.nombre}' borrado correctamente.")
-        actualizar_vista_ejercicios()  # Actualiza la tabla para reflejar el cambio
-
-def buscar_ejercicios():
-    """Filtra la tabla de ejercicios según el término de búsqueda."""
-    termino_busqueda = entry_buscar_ejercicio.get().lower()
-
-    for item in tree_ejercicios.get_children():
-        tree_ejercicios.delete(item)
-
-    if not termino_busqueda:
-        actualizar_vista_ejercicios()
-        return
-
-    for ej in ejercicios_creados:
-        if termino_busqueda in str(ej.id_ejercicio).lower() or \
-           termino_busqueda in str(ej.nombre).lower() or \
-           termino_busqueda in str(ej.grupo_muscular).lower():
-            tree_ejercicios.insert("", tk.END, values=(ej.id_ejercicio, ej.nombre, ej.grupo_muscular, f"{ej.series}x{ej.repeticiones}", f"{ej.duracion_segundos} seg"))
-
-
-# --- Widgets de la Pestaña Ejercicios ---
-btn_crear_ejercicio = ttk.Button(ejercicio_frame, text="Crear Nuevo Ejercicio", command=mostrar_form_crear_ejercicio)
-btn_crear_ejercicio.pack(pady=10)
-
-form_crear_ejercicio_frame = ttk.LabelFrame(ejercicio_frame, text="Crear Ejercicio", padding=(20, 10))
-labels_ejercicio = ["Nombre:", "Descripción:", "Grupo Muscular:", "Repeticiones:", "Series:", "Duración (seg):"]
-entries_ejercicio = [ttk.Entry(form_crear_ejercicio_frame) for _ in labels_ejercicio]
-(entry_ejercicio_nombre, entry_ejercicio_desc, entry_ejercicio_musculo, entry_ejercicio_rep, entry_ejercicio_series, entry_ejercicio_duracion) = entries_ejercicio
-
-for i, (text, widget) in enumerate(zip(labels_ejercicio, entries_ejercicio)):
-    ttk.Label(form_crear_ejercicio_frame, text=text).grid(row=i, column=0, padx=5, pady=5, sticky="w")
-    widget.grid(row=i, column=1, padx=5, pady=5, sticky="ew")
-
-form_crear_ejercicio_frame.columnconfigure(1, weight=1)
-ttk.Button(form_crear_ejercicio_frame, text="Guardar Ejercicio", command=guardar_nuevo_ejercicio).grid(row=len(labels_ejercicio), column=0, columnspan=2, pady=10)
-ttk.Button(form_crear_ejercicio_frame, text="Cancelar", command=ocultar_form_crear_ejercicio).grid(row=len(labels_ejercicio) + 1, column=0, columnspan=2, pady=5)
-
-vista_ejercicios_frame = ttk.LabelFrame(ejercicio_frame, text="Ejercicios Creados", padding=(10, 5))
-vista_ejercicios_frame.pack(padx=10, pady=10, fill="both", expand=True)
-
-search_frame_ejercicios = ttk.Frame(vista_ejercicios_frame)
-search_frame_ejercicios.pack(fill='x', padx=5, pady=5)
-
-entry_buscar_ejercicio = ttk.Entry(search_frame_ejercicios)
-entry_buscar_ejercicio.pack(side='left', fill='x', expand=True)
-
-btn_buscar_ejercicio = ttk.Button(search_frame_ejercicios, text="Buscar 🔎", command=buscar_ejercicios)
-btn_buscar_ejercicio.pack(side='right', padx=(5, 0))
-
-columns_ejercicios = ('id', 'nombre', 'grupo_muscular', 'series_reps', 'duracion')
-tree_ejercicios = ttk.Treeview(vista_ejercicios_frame, columns=columns_ejercicios, show='headings')
-tree_ejercicios.heading('id', text='ID')
-tree_ejercicios.heading('nombre', text='Nombre')
-tree_ejercicios.heading('grupo_muscular', text='Grupo Muscular')
-tree_ejercicios.heading('series_reps', text='Series x Reps')
-tree_ejercicios.heading('duracion', text='Duración')
-tree_ejercicios.column('id', width=50, anchor=tk.CENTER)
-tree_ejercicios.column('series_reps', width=50, anchor=tk.CENTER)
-tree_ejercicios.column('duracion', width=50, anchor=tk.CENTER)
-tree_ejercicios.pack(fill="both", expand=True)
-
-btn_borrar_ejercicio = ttk.Button(vista_ejercicios_frame, text="Borrar Ejercicio Seleccionado", command=borrar_ejercicio_seleccionado)
-btn_borrar_ejercicio.pack(pady=5)
 
 # --- Iniciar el bucle principal de la aplicación ---
 ventana_principal.mainloop()
