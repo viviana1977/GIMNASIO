@@ -23,14 +23,14 @@ socio_frame = VistaSocio(principal)
 
 instructor_frame = VistaInstructor(principal)
 
-clases_frame_2 = VistaClases(principal)
+clases_frame = VistaClases(principal)
 
-ejercicio_frame_2 = VistaEjercicio(principal)
+ejercicio_frame = VistaEjercicio(principal)
 
-horarios_frame_2 = VistaHorarios(principal)
+horarios_frame = VistaHorarios(principal)
 
-equipamiento_frame_2 = VistaEquipamiento(principal)
+equipamiento_frame = VistaEquipamiento(principal)
 
-rutina_frame_2 = VistaRutina(principal)
+rutina_frame = VistaRutina(principal)
 
 ventana_principal.mainloop()
