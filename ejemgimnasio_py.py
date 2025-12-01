@@ -4,9 +4,11 @@ from tkinter import *
 from datetime import datetime
 from tkinter import messagebox
 from vista_clases import VistaClases
+from vista_horarios import VistaHorarios
 from vista_instructor import VistaInstructor
 from vista_socio import VistaSocio
 from vista_ejercicio import VistaEjercicio
+
 
 import gimnasio_modelo as gc
 
@@ -198,7 +200,7 @@ btn_asignar = ttk.Button(form_asignar_frame, text="Asignar", command=asignar_ins
 btn_asignar.pack(pady=10)
 
 #################################
-
+horarios_frame_2 = VistaHorarios(principal)
 # --- Pestaña Horarios ---
 horarios_frame = ttk.Frame(principal)
 principal.add(horarios_frame, text="horarios")
@@ -330,6 +332,7 @@ tree_horarios.pack(fill="both", expand=True)
 btn_borrar_horario = ttk.Button(vista_horarios_frame, text="Borrar Horario Seleccionado", command=borrar_horario_seleccionado)
 btn_borrar_horario.pack(pady=5)
 
+############################################
 # --- Pestaña Equipamiento ---
 equipamiento_frame = ttk.Frame(principal)
 principal.add(equipamiento_frame, text="equipamiento")
