@@ -25,7 +25,10 @@ instructor_frame = VistaInstructor(principal)
 
 #############################################
 # --- Pestaña Clases ---
+
 clases_frame_2 = VistaClases(principal)
+
+ejercicio_frame_2 = VistaEjercicio(principal)
 
 clases_frame = ttk.Frame(principal)
 principal.add(clases_frame, text="clases")
