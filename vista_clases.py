@@ -104,8 +104,8 @@ class VistaClases(ttk.Frame):
     def actualizar_comboboxes_asignacion(self):
         """Actualiza los comboboxes de la sección de asignación."""
         self.combo_asignar_clase['values'] = [f"ID {c.id_clase}: {c.tipo}" for c in self.clases_creadas]
-        self.combo_asignar_instructor['values'] = [f"ID {i.id_instructor}: {i.nombre}" for i in instructores_creados]
-        self.combo_asignar_horario['values'] = [f"ID {h.id_dias}: {h.dia_semana} ({h.hora_inicio}-{h.hora_final})" for h in horarios_creados]
+        self.combo_asignar_instructor['values'] = [f"ID {i.id_instructor}: {i.nombre}" for i in self.instructores_creados]
+        self.combo_asignar_horario['values'] = [f"ID {h.id_dias}: {h.dia_semana} ({h.hora_inicio}-{h.hora_final})" for h in self.horarios_creados]
 
     def mostrar_form_crear_clase(self):
         self.btn_crear_clase.pack_forget()
@@ -146,8 +146,8 @@ class VistaClases(ttk.Frame):
         id_clase = int(clase_sel.split(":")[0].replace("ID ", ""))
         id_instructor = int(instructor_sel.split(":")[0].replace("ID ", ""))
 
-        clase_obj = next((c for c in clases_creadas if c.id_clase == id_clase), None)
-        instructor_obj = next((i for i in instructores_creados if i.id_instructor == id_instructor), None)
+        clase_obj = next((c for c in self.clases_creadas if c.id_clase == id_clase), None)
+        instructor_obj = next((i for i in self.instructores_creados if i.id_instructor == id_instructor), None)
 
         if clase_obj and instructor_obj:
             clase_obj.agregar_instructor(instructor_obj)
@@ -169,10 +169,10 @@ class VistaClases(ttk.Frame):
         item_values = self.tree_clases.item(selected_item, 'values')
         id_a_borrar = int(item_values[0])
 
-        clase_a_borrar = next((c for c in clases_creadas if c.id_clase == id_a_borrar), None)
+        clase_a_borrar = next((c for c in self.clases_creadas if c.id_clase == id_a_borrar), None)
         
         if clase_a_borrar:
-            clases_creadas.remove(clase_a_borrar)
+            self.clases_creadas.remove(clase_a_borrar)
             messagebox.showinfo("Éxito", f"Clase '{clase_a_borrar.tipo}' borrada correctamente.")
             self.actualizar_vista_clases()
             self.actualizar_comboboxes_asignacion()
@@ -188,7 +188,7 @@ class VistaClases(ttk.Frame):
             self.actualizar_vista_clases()
             return
 
-        for c in clases_creadas:
+        for c in self.clases_creadas:
             instructor_nombre = c.instructor.nombre if hasattr(c, 'instructor') else ""
             if termino_busqueda in str(c.id_clase).lower() or \
                termino_busqueda in str(c.tipo).lower() or \
