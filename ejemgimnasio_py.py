@@ -8,7 +8,7 @@ from vista_horarios import VistaHorarios
 from vista_instructor import VistaInstructor
 from vista_socio import VistaSocio
 from vista_ejercicio import VistaEjercicio
-
+from vista_equipamiento import VistaEquipamiento
 
 import gimnasio_modelo as gc
 
@@ -334,6 +334,8 @@ btn_borrar_horario.pack(pady=5)
 
 ############################################
 # --- Pestaña Equipamiento ---
+equipamiento_frame_2 = VistaEquipamiento(principal)
+
 equipamiento_frame = ttk.Frame(principal)
 principal.add(equipamiento_frame, text="equipamiento")
 
@@ -489,7 +491,7 @@ tree_equipos.pack(fill="both", expand=True)
 
 btn_borrar_equipo = ttk.Button(vista_equipos_frame, text="Borrar Equipo Seleccionado", command=borrar_equipo_seleccionado)
 btn_borrar_equipo.pack(pady=5)
-
+#############################################################################
 # --- Pestaña Rutina ---
 rutina_frame = ttk.Frame(principal)
 principal.add(rutina_frame, text="rutina")
