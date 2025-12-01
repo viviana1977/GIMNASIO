@@ -1,7 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
 from tkinter import *
-from datetime import datetime
 from tkinter import messagebox
 from vista_clases import VistaClases
 from vista_horarios import VistaHorarios
@@ -9,6 +8,7 @@ from vista_instructor import VistaInstructor
 from vista_socio import VistaSocio
 from vista_ejercicio import VistaEjercicio
 from vista_equipamiento import VistaEquipamiento
+from vista_rutina import VistaRutina
 
 import gimnasio_modelo as gc
 
@@ -493,6 +493,7 @@ btn_borrar_equipo = ttk.Button(vista_equipos_frame, text="Borrar Equipo Seleccio
 btn_borrar_equipo.pack(pady=5)
 #############################################################################
 # --- Pestaña Rutina ---
+rutina_frame_2 = VistaRutina(principal)
 rutina_frame = ttk.Frame(principal)
 principal.add(rutina_frame, text="rutina")
 
