@@ -6,7 +6,7 @@ import gimnasio_modelo as gc
 class VistaEjercicio(ttk.Frame):
     def __init__(self, master):
         super().__init__(master)
-        master.add(self, text="ejercicio")
+        master.add(self, text="Ejercicio")
         self.ejercicios_creados = []
 
         # --- Widgets de la Pestaña Ejercicios ---

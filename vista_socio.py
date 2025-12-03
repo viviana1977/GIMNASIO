@@ -6,15 +6,14 @@ import gimnasio_modelo as gc
 class VistaSocio(ttk.Frame):
     def __init__(self, master):
         super().__init__(master)
-        master.add(self, text="socio")
+        master.add(self, text="Socio")
         self.socios_creados = []
 
         # --- Formulario de Registro de Socios ---
         # Se crea el frame del formulario pero no se muestra inicialmente (sin .pack())
         self.form_frame = ttk.LabelFrame(self, text="Registrar Nuevo Socio", padding=(20, 10))
 
-        # Botón para mostrar el formulario de alta
-        self.btn_alta_socio = ttk.Button(self, text="Alta Socio", command=self.mostrar_formulario_alta)
+        self.btn_alta_socio = ttk.Button(self, text="Alta Socio", command=self.mostrar_formulario_alta, style="Alta.TButton")
         self.btn_alta_socio.pack(pady=20)
 
         # Creación de etiquetas y campos de entrada
@@ -34,6 +33,14 @@ class VistaSocio(ttk.Frame):
 
         # Configurar la columna de los campos de entrada para que se expanda
         self.form_frame.columnconfigure(1, weight=1)
+
+        # --- Botones del formulario ---
+        self.btn_registrar = ttk.Button(self.form_frame, text="Registrar Socio", command=self.registrar_nuevo_socio)
+        self.btn_registrar.grid(row=len(labels), column=0, columnspan=2, pady=10)
+
+        self.btn_cancelar = ttk.Button(self.form_frame, text="Cancelar", command=self.ocultar_formulario_alta)
+        self.btn_cancelar.grid(row=len(labels) + 1, column=0, columnspan=2, pady=5)
+
 
         # --- Vista de Socios Registrados ---
         self.vista_socios_frame = ttk.LabelFrame(self, text="Socios Registrados", padding=(10, 5))

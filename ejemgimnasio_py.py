@@ -12,7 +12,9 @@ from vista_rutina import VistaRutina
 
 import gimnasio_modelo as gc
 
+
 ventana_principal = tk.Tk()
+ventana_principal.state('zoomed')
 ventana_principal.title("GIMNASIO")
 ventana_principal.geometry("800x600")
 #ventana_principal.resizable(0,0)
@@ -32,5 +34,9 @@ horarios_frame = VistaHorarios(principal)
 equipamiento_frame = VistaEquipamiento(principal)
 
 rutina_frame = VistaRutina(principal)
+
+style = ttk.Style()
+style.configure("Alta.TButton", foreground="white", bordercolor="green", relief="solid", font=("Arial", 12, "bold"))
+
 
 ventana_principal.mainloop()

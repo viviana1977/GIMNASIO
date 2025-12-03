@@ -6,7 +6,7 @@ import gimnasio_modelo as gc
 class VistaHorarios(ttk.Frame):
     def __init__(self, master):
         super().__init__(master)
-        master.add(self, text="horarios")
+        master.add(self, text="Horarios")
         self.horarios_creados = []
 
         # --- Botón y Formulario de Creación de Horarios ---
