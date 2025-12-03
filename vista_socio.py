@@ -65,7 +65,7 @@ class VistaSocio(ttk.Frame):
         self.tree_socios.column('id', width=50, anchor=tk.CENTER)
         self.tree_socios.pack(fill="both", expand=True)
 
-        btn_borrar_socio = ttk.Button(self.vista_socios_frame, text="Borrar Socio Seleccionado", command=self.borrar_socio_seleccionado)
+        btn_borrar_socio = ttk.Button(self.vista_socios_frame, text="Borrar Socio Seleccionado", command=self.borrar_socio_seleccionado, style="Baja.TButton")
         btn_borrar_socio.pack(pady=5)
 
         # --- Botones ---

@@ -35,8 +35,25 @@ equipamiento_frame = VistaEquipamiento(principal)
 
 rutina_frame = VistaRutina(principal)
 
+# --- Pestaña Salir ---
+salir_frame = ttk.Frame(principal)
+principal.add(salir_frame, text="Salir")
+
+def salir_aplicacion():
+    """Muestra un cuadro de diálogo de confirmación y cierra la aplicación si se confirma."""
+    if messagebox.askyesno("Salir", "¿Está seguro de que desea salir de la aplicación?"):
+        ventana_principal.destroy()
+
+# Configurar el frame para centrar el botón
+salir_frame.columnconfigure(0, weight=1)
+salir_frame.rowconfigure(0, weight=1)
+
+btn_salir = ttk.Button(salir_frame, text="Cerrar Aplicación", command=salir_aplicacion, style="Baja.TButton")
+btn_salir.grid(row=0, column=0, ipadx=30, ipady=15)
+
 style = ttk.Style()
-style.configure("Alta.TButton", foreground="white", bordercolor="green", relief="solid", font=("Arial", 12, "bold"))
+style.configure("Alta.TButton", foreground="black", background='green', font=("Arial", 12, "normal"))
+style.configure("Baja.TButton", foreground="black", background="red", font=("Arial", 12, "normal"))
 
-
+ventana_principal.protocol("WM_DELETE_WINDOW", salir_aplicacion) # Captura el evento de cierre de la ventana
 ventana_principal.mainloop()
