@@ -96,6 +96,16 @@ cursor.executescript('''
         "sueldo" INTEGER,
         PRIMARY KEY("id_instructor")
     );
+
+    CREATE TABLE IF NOT EXISTS "usuarios" (
+        "id_usuario" INTEGER PRIMARY KEY AUTOINCREMENT,
+        "nombre_usuario" TEXT NOT NULL UNIQUE,
+        "contraseña" TEXT NOT NULL,
+        "rol" TEXT NOT NULL
+    );
 ''')
 
+cursor.execute("INSERT OR IGNORE INTO usuarios (nombre_usuario, contraseña, rol) VALUES ('dueño', 'dueño123', 'propietario')")
+cursor.execute("INSERT OR IGNORE INTO usuarios (nombre_usuario, contraseña, rol) VALUES ('instructor', 'instructor123', 'instructor')")
+mi_conexion.commit()
 mi_conexion.close()
