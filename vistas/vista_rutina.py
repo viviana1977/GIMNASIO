@@ -3,7 +3,7 @@
 from tkinter import ttk, messagebox
 import tkinter as tk
 from datetime import datetime
-import gimnasio_modelo as gc
+from modelos import Rutina
 
 
 class VistaRutina(ttk.Frame):
@@ -95,7 +95,7 @@ class VistaRutina(ttk.Frame):
         
         # Simular un ID único para la rutina
         id_rutina = len(self.rutinas_creadas) + 1
-        nueva_rutina = gc.rutina(id_rutina, tipo, duracion)
+        nueva_rutina = Rutina(id_rutina, tipo, duracion)
         
         # Asignar el ejercicio inicial
         nueva_rutina.asignar_ejercicio(ejercicio_inicial)
@@ -174,4 +174,3 @@ class VistaRutina(ttk.Frame):
             termino_busqueda in str(r.tipo).lower() or \
             termino_busqueda in str(r.duracion).lower():
                 self.tree_rutinas.insert("", tk.END, values=(r.id_rutina, r.tipo, r.duracion, len(r.ejercicios)))
-

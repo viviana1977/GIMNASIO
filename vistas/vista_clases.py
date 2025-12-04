@@ -1,6 +1,6 @@
 from tkinter import ttk, messagebox
 import tkinter as tk
-import gimnasio_modelo as gc
+from modelos import *
 
 # --- Pestaña Clases ---
 class VistaClases(ttk.Frame):
@@ -125,7 +125,7 @@ class VistaClases(ttk.Frame):
             return
 
         id_clase = len(self.clases_creadas) + 1
-        nueva_clase = gc.clases(id_clase, tipo, capacidad, nombres)
+        nueva_clase = Clases(id_clase, tipo, capacidad, nombres)
         self.clases_creadas.append(nueva_clase)
 
         messagebox.showinfo("Éxito", f"Clase '{tipo}' creada correctamente.")

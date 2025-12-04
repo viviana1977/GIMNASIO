@@ -1,6 +1,6 @@
 from  tkinter import ttk, messagebox
 import tkinter as tk
-import gimnasio_modelo as gc
+from modelos import Horario
 
 # --- Pestaña Horarios---
 class VistaHorarios(ttk.Frame):
@@ -84,7 +84,7 @@ class VistaHorarios(ttk.Frame):
             return
 
         id_horario = len(self.horarios_creados) + 1
-        nuevo_horario = gc.horarios(id_horario, dia, inicio, fin)
+        nuevo_horario = Horario(id_horario, dia, inicio, fin)
         self.horarios_creados.append(nuevo_horario)
 
         messagebox.showinfo("Éxito", f"Horario para el {dia} de {inicio} a {fin} creado.")
@@ -114,7 +114,7 @@ class VistaHorarios(ttk.Frame):
         if horario_a_borrar:
             self.horarios_creados.remove(horario_a_borrar)
             messagebox.showinfo("Éxito", "Horario borrado correctamente.")
-            actualizar_vista_horarios()
+            self.actualizar_vista_horarios()
 
     def buscar_horarios(self):
         """Filtra la tabla de horarios según el término de búsqueda."""
@@ -124,7 +124,7 @@ class VistaHorarios(ttk.Frame):
             self.tree_horarios.delete(item)
 
         if not termino_busqueda:
-            actualizar_vista_horarios()
+            self.actualizar_vista_horarios()
             return
 
         for h in self.horarios_creados:

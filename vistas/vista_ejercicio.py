@@ -1,7 +1,7 @@
 from tkinter import ttk, messagebox
 import tkinter as tk
 from datetime import datetime
-import gimnasio_modelo as gc
+from modelos import Ejercicio
 
 class VistaEjercicio(ttk.Frame):
     def __init__(self, master):
@@ -83,7 +83,7 @@ class VistaEjercicio(ttk.Frame):
             return
 
         id_ejercicio = len(self.ejercicios_creados) + 1
-        nuevo_ejercicio = gc.ejercicio(id_ejercicio, nombre, descripcion, grupo_muscular, repeticiones, series, duracion)
+        nuevo_ejercicio = Ejercicio(id_ejercicio, nombre, descripcion, grupo_muscular, repeticiones, series, duracion)
         self.ejercicios_creados.append(nuevo_ejercicio)
 
         messagebox.showinfo("Éxito", f"Ejercicio '{nombre}' creado correctamente.")

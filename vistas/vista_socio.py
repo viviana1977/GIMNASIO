@@ -1,7 +1,7 @@
 from tkinter import ttk, messagebox
 import tkinter as tk
 from datetime import datetime
-import gimnasio_modelo as gc
+from modelos import Socio
 
 class VistaSocio(ttk.Frame):
     def __init__(self, master):
@@ -70,15 +70,16 @@ class VistaSocio(ttk.Frame):
         btn_borrar_socio = ttk.Button(self.vista_socios_frame, text="Borrar Socio Seleccionado", command=self.borrar_socio_seleccionado, style="Baja.TButton")
         btn_borrar_socio.pack(pady=5)
 
-        # --- Botones ---
-        # Botones del formulario (se crean pero no se muestran)
-        self.btn_registrar = ttk.Button(self, text="Registrar Socio", command=self.registrar_nuevo_socio)
-        self.btn_cancelar = ttk.Button(self, text="Cancelar", command=self.ocultar_formulario_alta)
+        self.actualizar_vista_socios()
 
+        
     def actualizar_vista_socios(self):
         """Limpia y actualiza la tabla de socios."""
         for item in self.tree_socios.get_children():
             self.tree_socios.delete(item)
+
+        self.socios_creados = Socio.obtener_todos()
+        
         for socio in self.socios_creados:
             self.tree_socios.insert("", tk.END, values=(socio.id_socio, socio.nombre_apellido, socio.dni, socio.telefono))
 
@@ -87,8 +88,7 @@ class VistaSocio(ttk.Frame):
         self.btn_alta_socio.pack_forget()
         self.vista_socios_frame.pack_forget()
         self.form_frame.pack(padx=10, pady=10, fill="x")
-        self.btn_registrar.pack(pady=10)
-        self.btn_cancelar.pack(pady=5)
+
 
     def ocultar_formulario_alta(self):
         """Oculta el formulario de registro y vuelve a mostrar el botón 'Alta'."""
@@ -117,10 +117,10 @@ class VistaSocio(ttk.Frame):
             return
 
         # Crear y guardar el nuevo socio
-        id_socio = len(self.socios_creados) + 1
         fecha_registro = datetime.now().strftime("%d/%m/%Y")
-        nuevo_socio = gc.Socio(id_socio, nombre, dni, direccion, fecha_nac, telefono, email, fecha_registro, talle, peso, objetivo)
-        self.socios_creados.append(nuevo_socio)
+        nuevo_socio = Socio(None, nombre, dni, direccion, fecha_nac, telefono, email, talle, peso, objetivo)
+        nuevo_socio.guardar()
+        #self.socios_creados.append(nuevo_socio)
         
         messagebox.showinfo("Registro Exitoso", f"Socio {nombre} registrado correctamente.")
         

@@ -1,7 +1,7 @@
 from tkinter import ttk, messagebox
 import tkinter as tk
 from datetime import datetime
-import gimnasio_modelo as gc
+from modelos import Equipamiento
 
 class VistaEquipamiento(ttk.Frame):
     def __init__(self, master):
@@ -92,7 +92,7 @@ class VistaEquipamiento(ttk.Frame):
             return
 
         id_equipo = len(self.equipos_creados) + 1
-        nuevo_equipo = gc.equipamiento(id_equipo, capacidad, tipo_maquina, musculos, estado)
+        nuevo_equipo = Equipamiento(id_equipo, capacidad, tipo_maquina, musculos, estado)
         self.equipos_creados.append(nuevo_equipo)
 
         messagebox.showinfo("Éxito", f"Equipo '{tipo_maquina}' agregado correctamente.")

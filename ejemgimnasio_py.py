@@ -3,13 +3,7 @@ from tkinter import ttk
 from tkinter import messagebox
 import sqlite3
 
-from vista_clases import VistaClases
-from vista_horarios import VistaHorarios
-from vista_instructor import VistaInstructor
-from vista_socio import VistaSocio
-from vista_ejercicio import VistaEjercicio
-from vista_equipamiento import VistaEquipamiento
-from vista_rutina import VistaRutina
+from vistas import VistaClases, VistaHorarios, VistaInstructor, VistaSocio, VistaEjercicio, VistaEquipamiento, VistaRutina
 
 class App(tk.Tk):
     def __init__(self):

@@ -2,27 +2,19 @@ import sqlite3
 mi_conexion = sqlite3.connect('gimnasio.db')
 cursor = mi_conexion.cursor()
 cursor.executescript('''
-    CREATE TABLE IF NOT EXISTS "telefonos" (
-        "id_telefono" INTEGER NOT NULL UNIQUE,
-        "nro_telefono" TEXT,
-        PRIMARY KEY("id_telefono")
-    );
-
     CREATE TABLE IF NOT EXISTS "socios" (
         "id_socio" INTEGER NOT NULL UNIQUE,
         "nombre_y_apellido" TEXT,
         "dni" TEXT,
         "direccion" TEXT,
         "fnac" TEXT,
-        "id_telefono" INTEGER NOT NULL UNIQUE,
         "email" TEXT,
+        "telefono" TEXT,
         "talla" TEXT,
         "peso" TEXT,
         "objetivo" TEXT,
-        "id_rutina" INTEGER NOT NULL,
+        "id_rutina" INTEGER,
         PRIMARY KEY("id_socio"),
-        FOREIGN KEY ("id_telefono") REFERENCES "telefonos"("id_telefono")
-        ON UPDATE NO ACTION ON DELETE NO ACTION,
         FOREIGN KEY ("id_rutina") REFERENCES "rutinas"("id-rutina")
         ON UPDATE NO ACTION ON DELETE NO ACTION
     );

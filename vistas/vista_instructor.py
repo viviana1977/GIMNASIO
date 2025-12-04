@@ -1,6 +1,6 @@
 from tkinter import ttk, messagebox
 import tkinter as tk
-import gimnasio_modelo as gc
+from modelos import Instructor
 
 # --- Pestaña instructor ---
 class VistaInstructor(ttk.Frame):
@@ -115,7 +115,7 @@ class VistaInstructor(ttk.Frame):
             return
 
         id_instructor = len(self.instructores_creados) + 1
-        nuevo_instructor = gc.instructor(id_instructor, nombre, direccion, telefono, sueldo)
+        nuevo_instructor = Instructor(id_instructor, nombre, direccion, telefono, sueldo)
         self.instructores_creados.append(nuevo_instructor)
 
         messagebox.showinfo("Éxito", f"Instructor {nombre} registrado correctamente.")
