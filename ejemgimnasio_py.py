@@ -71,12 +71,16 @@ class App(tk.Tk):
         except sqlite3.Error as e:
             messagebox.showerror("Error de Base de Datos", f"No se pudo conectar a la base de datos: {e}")
 
+
+
+
     def mostrar_ventana_principal(self, rol):
         """Destruye la ventana de login y muestra la aplicación principal."""
         self.login_frame.destroy()
         
         # Centrar la ventana principal después del login
         self._centrar_ventana(800, 600)
+        self.state('zoomed')
         self.resizable(True, True)
         self.title(f"GIMNASIO - Rol: {rol.capitalize()}")
 
@@ -108,6 +112,12 @@ class App(tk.Tk):
 
         btn_salir = ttk.Button(salir_frame, text="Cerrar Aplicación", command=salir_aplicacion, style="Baja.TButton")
         btn_salir.grid(row=0, column=0, ipadx=30, ipady=15)
+
+
+
+
+
+
 
         style = ttk.Style()
         style.configure("Alta.TButton", foreground="black", background='green', font=("Arial", 12, "normal"))

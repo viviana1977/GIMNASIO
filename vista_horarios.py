@@ -10,7 +10,7 @@ class VistaHorarios(ttk.Frame):
         self.horarios_creados = []
 
         # --- Botón y Formulario de Creación de Horarios ---
-        self.btn_crear_horario = ttk.Button(self, text="Crear Nuevo Horario", command=self.mostrar_form_crear_horario)
+        self.btn_crear_horario = ttk.Button(self, text="Crear Nuevo Horario", command=self.mostrar_form_crear_horario, style="Alta.TButton")
         self.btn_crear_horario.pack(pady=10)
 
         # ---Formulario de Creacion de Horarios---
@@ -51,7 +51,7 @@ class VistaHorarios(ttk.Frame):
         self.tree_horarios.column('id', width=50, anchor=tk.CENTER)
         self.tree_horarios.pack(fill="both", expand=True)
 
-        self.btn_borrar_horario = ttk.Button(self.vista_horarios_frame, text="Borrar Horario Seleccionado", command=self.borrar_horario_seleccionado)
+        self.btn_borrar_horario = ttk.Button(self.vista_horarios_frame, text="Borrar Horario Seleccionado", command=self.borrar_horario_seleccionado, style="Baja.TButton")
         self.btn_borrar_horario.pack(pady=5)
 
     def actualizar_vista_horarios(self):

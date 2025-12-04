@@ -10,7 +10,7 @@ class VistaInstructor(ttk.Frame):
         self.instructores_creados = []
 
         # --- Button to show the registration form ---
-        self.btn_alta_instructor = ttk.Button(self, text="Alta Instructor", command=self.mostrar_form_alta_instructor)
+        self.btn_alta_instructor = ttk.Button(self, text="Alta Instructor", command=self.mostrar_form_alta_instructor, style="Alta.TButton")
         self.btn_alta_instructor.pack(pady=10)
 
         # --- Formulario de Registro de Instructores (initially hidden) ---
@@ -70,7 +70,7 @@ class VistaInstructor(ttk.Frame):
 
         self.btn_borrar_instructor = ttk.Button(self.vista_instructores_frame, 
                                                 text="Borrar Instructor Seleccionado", 
-                                                command=self.borrar_instructor_seleccionado)
+                                                command=self.borrar_instructor_seleccionado, style="Baja.TButton")
         self.btn_borrar_instructor.pack(pady=5)
 
         # Initial update of the view

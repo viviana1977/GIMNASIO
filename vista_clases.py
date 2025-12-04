@@ -10,7 +10,7 @@ class VistaClases(ttk.Frame):
         self.clases_creadas = []
 
         #---button to show the registration form---
-        self.btn_crear_clase = ttk.Button(self, text="Crear Nueva Clase", command=self.mostrar_form_crear_clase)
+        self.btn_crear_clase = ttk.Button(self, text="Crear Nueva Clase", command=self.mostrar_form_crear_clase, style="Alta.TButton")
         self.btn_crear_clase.pack(pady=10)
 
         #-- Formulario de Creación de Clases (initially hidden) ---
@@ -70,7 +70,7 @@ class VistaClases(ttk.Frame):
 
         self.btn_borrar_clase = ttk.Button(self.vista_clases_frame, 
                                            text="Borrar Clase Seleccionada",
-                                           command=self.borrar_clase_seleccionada)
+                                           command=self.borrar_clase_seleccionada, style="Baja.TButton")
         self.btn_borrar_clase.pack(pady=5)
         # --- Formulario de Asignación de Instructores y Horarios ---
         form_asignar_frame = ttk.LabelFrame(self, text="Asignar Instructor y Horario", padding=(20, 10))

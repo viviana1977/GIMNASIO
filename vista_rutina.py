@@ -16,7 +16,7 @@ class VistaRutina(ttk.Frame):
         self.form_crear_rutina_frame = ttk.LabelFrame(self, text="Crear una nueva rutina", padding=(20, 10))
 
         # --- Botón principal para crear rutina ---
-        self.btn_crear_rutina = ttk.Button(self, text="Crear Rutina", command=self.mostrar_form_crear_rutina)
+        self.btn_crear_rutina = ttk.Button(self, text="Crear Rutina", command=self.mostrar_form_crear_rutina, style="Alta.TButton")
         self.btn_crear_rutina.pack(pady=10)
 
         ttk.Label(self.form_crear_rutina_frame, text="Tipo de Rutina:").grid(row=0, column=0, padx=5, pady=5, sticky="w")
@@ -56,7 +56,7 @@ class VistaRutina(ttk.Frame):
         self.tree_rutinas.column('id', width=50, anchor=tk.CENTER)
         self.tree_rutinas.pack(fill="both", expand=True)
 
-        self.btn_borrar_rutina = ttk.Button(self.vista_rutinas_frame, text="Borrar Rutina Seleccionada", command=self.borrar_rutina_seleccionada)
+        self.btn_borrar_rutina = ttk.Button(self.vista_rutinas_frame, text="Borrar Rutina Seleccionada", command=self.borrar_rutina_seleccionada, style="Baja.TButton")
         self.btn_borrar_rutina.pack(pady=5)
 
     def actualizar_vista_rutinas(self):

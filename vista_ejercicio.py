@@ -10,7 +10,7 @@ class VistaEjercicio(ttk.Frame):
         self.ejercicios_creados = []
 
         # --- Widgets de la Pestaña Ejercicios ---
-        self.btn_crear_ejercicio = ttk.Button(self, text="Crear Nuevo Ejercicio", command=self.mostrar_form_crear_ejercicio)
+        self.btn_crear_ejercicio = ttk.Button(self, text="Crear Nuevo Ejercicio", command=self.mostrar_form_crear_ejercicio, style="Alta.TButton")
         self.btn_crear_ejercicio.pack(pady=10)
 
         self.form_crear_ejercicio_frame = ttk.LabelFrame(self, text="Crear Ejercicio", padding=(20, 10))
@@ -50,7 +50,7 @@ class VistaEjercicio(ttk.Frame):
         self.tree_ejercicios.column('duracion', width=50, anchor=tk.CENTER)
         self.tree_ejercicios.pack(fill="both", expand=True)
 
-        btn_borrar_ejercicio = ttk.Button(self.vista_ejercicios_frame, text="Borrar Ejercicio Seleccionado", command=self.borrar_ejercicio_seleccionado)
+        btn_borrar_ejercicio = ttk.Button(self.vista_ejercicios_frame, text="Borrar Ejercicio Seleccionado", command=self.borrar_ejercicio_seleccionado, style="Baja.TButton")
         btn_borrar_ejercicio.pack(pady=5)
 
     def actualizar_vista_ejercicios(self):

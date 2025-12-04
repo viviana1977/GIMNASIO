@@ -13,6 +13,8 @@ class VistaSocio(ttk.Frame):
         # Se crea el frame del formulario pero no se muestra inicialmente (sin .pack())
         self.form_frame = ttk.LabelFrame(self, text="Registrar Nuevo Socio", padding=(20, 10))
 
+        
+
         self.btn_alta_socio = ttk.Button(self, text="Alta Socio", command=self.mostrar_formulario_alta, style="Alta.TButton")
         self.btn_alta_socio.pack(pady=20)
 

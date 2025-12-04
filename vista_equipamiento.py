@@ -10,7 +10,7 @@ class VistaEquipamiento(ttk.Frame):
         self.equipos_creados = []
 
         # --- Botón principal y formularios de Equipamiento ---
-        self.btn_agregar_equipo = ttk.Button(self, text="Agregar Equipamiento", command=self.mostrar_form_agregar_equipo)
+        self.btn_agregar_equipo = ttk.Button(self, text="Agregar Equipamiento", command=self.mostrar_form_agregar_equipo, style="Alta.TButton")
         self.btn_agregar_equipo.pack(pady=10)
 
         self.form_agregar_equipo_frame = ttk.LabelFrame(self,text="Agregar Nuevo Equipamiento", padding=(20, 10))
@@ -52,7 +52,7 @@ class VistaEquipamiento(ttk.Frame):
         tree_equipos.column('id', width=50, anchor=tk.CENTER)
         tree_equipos.pack(fill="both", expand=True)
 
-        btn_borrar_equipo = ttk.Button(self.vista_equipos_frame, text="Borrar Equipo Seleccionado", command=self.borrar_equipo_seleccionado)
+        btn_borrar_equipo = ttk.Button(self.vista_equipos_frame, text="Borrar Equipo Seleccionado", command=self.borrar_equipo_seleccionado, style="Baja.TButton")
         btn_borrar_equipo.pack(pady=5)
     
     def actualizar_vista_equipos(self):
