@@ -1,3 +1,5 @@
+import sqlite3
+
 class Ejercicio:    
     def __init__(self, id_ejercicio, nombre, descripcion, grupo_muscular, repeticiones, series, duracion_segundos):
         self.id_ejercicio = id_ejercicio
@@ -31,3 +33,34 @@ class Ejercicio:
         if duracion_segundos is not None:
             self.duracion_segundos = duracion_segundos
         print(f"Ejercicio {self.id_ejercicio} modificado.")
+
+    def guardar(self):
+        conn = sqlite3.connect('gimnasio.db')
+        cursor = conn.cursor()
+        
+        sql = '''
+        INSERT INTO ejercicios (nombre, descripcion, grupo_muscular, repeticiones, series, duracion_segundos) 
+        VALUES (?, ?, ?, ?, ?, ?)
+        '''
+        parametros = (self.nombre, self.descripcion, self.grupo_muscular, self.repeticiones, self.series, self.duracion_segundos)
+        
+        cursor.execute(sql,parametros)
+        conn.commit()
+        conn.close()
+    
+    @classmethod
+    def obtener_todos(cls):
+        conn = sqlite3.connect('gimnasio.db')
+        cursor = conn.cursor()
+
+        sql = '''
+        SELECT * FROM ejercicios
+        '''
+        cursor.execute(sql)
+        ejercicios = []
+        for row in cursor.fetchall():
+            ejercicios = cls(row[0], row[1], row[2], row[3], row[4], row[5])
+            ejercicios.append(ejercicios)
+        conn.close()
+
+        return ejercicios

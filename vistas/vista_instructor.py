@@ -84,6 +84,9 @@ class VistaInstructor(ttk.Frame):
         """Limpia y actualiza la tabla de instructores."""
         for item in self.tree_instructores.get_children():
             self.tree_instructores.delete(item)
+
+        self.instructores_creados = Instructor.obtener_todos()
+
         for inst in self.instructores_creados:
             self.tree_instructores.insert("", tk.END, values=(inst.id_instructor, 
                                                              inst.nombre, inst.telefono, inst.sueldo))
@@ -114,9 +117,8 @@ class VistaInstructor(ttk.Frame):
             messagebox.showerror("Error", "Todos los campos son obligatorios.")
             return
 
-        id_instructor = len(self.instructores_creados) + 1
-        nuevo_instructor = Instructor(id_instructor, nombre, direccion, telefono, sueldo)
-        self.instructores_creados.append(nuevo_instructor)
+        nuevo_instructor = Instructor(None, nombre, direccion, telefono, sueldo)
+        nuevo_instructor.guardar()
 
         messagebox.showinfo("Éxito", f"Instructor {nombre} registrado correctamente.")
         print(f"Nuevo instructor registrado: ID={nuevo_instructor.id_instructor}, "

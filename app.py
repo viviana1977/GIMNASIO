@@ -66,8 +66,6 @@ class App(tk.Tk):
             messagebox.showerror("Error de Base de Datos", f"No se pudo conectar a la base de datos: {e}")
 
 
-
-
     def mostrar_ventana_principal(self, rol):
         """Destruye la ventana de login y muestra la aplicación principal."""
         self.login_frame.destroy()
@@ -83,13 +81,29 @@ class App(tk.Tk):
         principal = ttk.Notebook(self)
         principal.pack(fill='both', expand=True, padx=10, pady=10)
 
-        VistaSocio(principal)
-        VistaInstructor(principal)
-        VistaClases(principal)
-        VistaEjercicio(principal)
-        VistaHorarios(principal)
-        VistaEquipamiento(principal)
-        VistaRutina(principal)
+        # 1. Crear vistas que no dependen de otras
+        vista_socio = VistaSocio(principal)
+        vista_instructor = VistaInstructor(principal)
+        vista_horarios = VistaHorarios(principal)
+        vista_ejercicio = VistaEjercicio(principal)
+        vista_equipamiento = VistaEquipamiento(principal)
+        
+        # 2. Crear vistas que SÍ dependen de otras, pasando las instancias necesarias
+        vista_clases = VistaClases(principal, vista_instructor, vista_horarios)
+        vista_rutina = VistaRutina(principal) # Podría necesitar vista_ejercicio en el futuro
+
+        # 3. (Opcional pero recomendado) Conectar las actualizaciones
+        # Cuando se guarda un instructor, se actualiza el combobox en clases
+        def guardar_instructor_y_actualizar():
+            vista_instructor.guardar_nuevo_instructor()
+            vista_clases.actualizar_comboboxes_asignacion()
+        vista_instructor.btn_guardar_instructor.config(command=guardar_instructor_y_actualizar)
+
+        # Cuando se guarda un horario, se actualiza el combobox en clases
+        def guardar_horario_y_actualizar():
+            vista_horarios.guardar_nuevo_horario()
+            vista_clases.actualizar_comboboxes_asignacion()
+        vista_horarios.btn_guardar_horario.config(command=guardar_horario_y_actualizar)
 
         # --- Pestaña Salir ---
         salir_frame = ttk.Frame(principal)
@@ -106,12 +120,6 @@ class App(tk.Tk):
 
         btn_salir = ttk.Button(salir_frame, text="Cerrar Aplicación", command=salir_aplicacion, style="Baja.TButton")
         btn_salir.grid(row=0, column=0, ipadx=30, ipady=15)
-
-
-
-
-
-
 
         style = ttk.Style()
         style.configure("Alta.TButton", foreground="black", background='green', font=("Arial", 12, "normal"))

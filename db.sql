@@ -84,7 +84,7 @@ CREATE TABLE IF NOT EXISTS "horarios" (
 	PRIMARY KEY("id_horario")
 );
 
-CREATE TABLE IF NOT EXISTS "instructor" (
+CREATE TABLE IF NOT EXISTS "instructores" (
 	"id_instructor" INTEGER NOT NULL UNIQUE,
 	"nombre" TEXT,
 	"direccion" TEXT,

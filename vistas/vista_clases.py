@@ -1,14 +1,16 @@
 from tkinter import ttk, messagebox
 import tkinter as tk
-from modelos import *
+from modelos import Clases, Instructor, Horario
 
 # --- Pestaña Clases ---
 class VistaClases(ttk.Frame):
-    def __init__(self, master):
+    def __init__(self, master, vista_instructor, vista_horarios):
         super().__init__(master)
         master.add(self, text="Clases") # Changed text to "Clases" for consistency
         self.clases_creadas = []
-
+        self.vista_instructor = vista_instructor
+        self.vista_horarios = vista_horarios
+ 
         #---button to show the registration form---
         self.btn_crear_clase = ttk.Button(self, text="Crear Nueva Clase", command=self.mostrar_form_crear_clase, style="Alta.TButton")
         self.btn_crear_clase.pack(pady=10)
@@ -60,17 +62,17 @@ class VistaClases(ttk.Frame):
 
         
         columns_clases = ('id', 'tipo', 'capacidad', 'instructor')
-        tree_clases = ttk.Treeview(self.vista_clases_frame, columns=columns_clases, show='headings')
-        tree_clases.heading('id', text='ID')
-        tree_clases.heading('tipo', text='Tipo')
-        tree_clases.heading('capacidad', text='Capacidad')
-        tree_clases.heading('instructor', text='Instructor Asignado')
-        tree_clases.column('id', width=50, anchor=tk.CENTER)
-        tree_clases.pack(fill="both", expand=True)
+        self.tree_clases = ttk.Treeview(self.vista_clases_frame, columns=columns_clases, show='headings')
+        self.tree_clases.heading('id', text='ID')
+        self.tree_clases.heading('tipo', text='Tipo')
+        self.tree_clases.heading('capacidad', text='Capacidad')
+        self.tree_clases.heading('instructor', text='Instructor Asignado')
+        self.tree_clases.column('id', width=50, anchor=tk.CENTER)
+        self.tree_clases.pack(fill="both", expand=True)
 
         self.btn_borrar_clase = ttk.Button(self.vista_clases_frame, 
                                            text="Borrar Clase Seleccionada",
-                                           command=self.borrar_clase_seleccionada, style="Baja.TButton")
+                                           command=self.borrar_clase_seleccionada, style="Baja.TButton") #
         self.btn_borrar_clase.pack(pady=5)
         # --- Formulario de Asignación de Instructores y Horarios ---
         form_asignar_frame = ttk.LabelFrame(self, text="Asignar Instructor y Horario", padding=(20, 10))
@@ -86,26 +88,33 @@ class VistaClases(ttk.Frame):
         self.combo_asignar_instructor.pack(pady=2, fill="x")
 
         ttk.Label(form_asignar_frame, text="Asignar Horario:").pack(pady=2)
-        combo_asignar_horario = ttk.Combobox(form_asignar_frame, state="readonly")
-        combo_asignar_horario.pack(pady=2, fill="x")
+        self.combo_asignar_horario = ttk.Combobox(form_asignar_frame, state="readonly")
+        self.combo_asignar_horario.pack(pady=2, fill="x")
 
         btn_asignar = ttk.Button(form_asignar_frame, text="Asignar", command=self.asignar_instructor_a_clase)
         btn_asignar.pack(pady=10)
+
+        self.actualizar_comboboxes_asignacion()
+        self.actualizar_vista_clases()
 
          
     def actualizar_vista_clases(self):
             """Limpia y actualiza la tabla de clases."""    
             for item in self.tree_clases.get_children():
                 self.tree_clases.delete(item)
+            self.clases_creadas = Clases.obtener_todos()
+
             for c in self.clases_creadas:
-                instructor_nombre = c.instructor.nombre if hasattr(c, 'instructor') else "No asignado"
+                # El atributo 'instructor' no existe por defecto, lo añadiremos al asignar
+                instructor_nombre = getattr(c, 'instructor', None)
+                instructor_nombre = instructor_nombre.nombre if instructor_nombre else "No asignado"
                 self.tree_clases.insert("", tk.END, values=(c.id_clase, c.tipo, c.capacidad, instructor_nombre))
 
     def actualizar_comboboxes_asignacion(self):
         """Actualiza los comboboxes de la sección de asignación."""
         self.combo_asignar_clase['values'] = [f"ID {c.id_clase}: {c.tipo}" for c in self.clases_creadas]
-        self.combo_asignar_instructor['values'] = [f"ID {i.id_instructor}: {i.nombre}" for i in self.instructores_creados]
-        self.combo_asignar_horario['values'] = [f"ID {h.id_dias}: {h.dia_semana} ({h.hora_inicio}-{h.hora_final})" for h in self.horarios_creados]
+        self.combo_asignar_instructor['values'] = [f"ID {i.id_instructor}: {i.nombre}" for i in self.vista_instructor.instructores_creados]
+        self.combo_asignar_horario['values'] = [f"ID {h.id_dias}: {h.dia_semana} ({h.hora_inicio}-{h.hora_final})" for h in self.vista_horarios.horarios_creados]
 
     def mostrar_form_crear_clase(self):
         self.btn_crear_clase.pack_forget()
@@ -124,9 +133,8 @@ class VistaClases(ttk.Frame):
             messagebox.showerror("Error", "Todos los campos son obligatorios.")
             return
 
-        id_clase = len(self.clases_creadas) + 1
-        nueva_clase = Clases(id_clase, tipo, capacidad, nombres)
-        self.clases_creadas.append(nueva_clase)
+        nueva_clase = Clases(None, tipo, capacidad, nombres)
+        nueva_clase.guardar()
 
         messagebox.showinfo("Éxito", f"Clase '{tipo}' creada correctamente.")
         for entry in [self.entry_clase_tipo, self.entry_clase_capacidad, self.entry_clase_nombres]:
@@ -147,7 +155,7 @@ class VistaClases(ttk.Frame):
         id_instructor = int(instructor_sel.split(":")[0].replace("ID ", ""))
 
         clase_obj = next((c for c in self.clases_creadas if c.id_clase == id_clase), None)
-        instructor_obj = next((i for i in self.instructores_creados if i.id_instructor == id_instructor), None)
+        instructor_obj = next((i for i in self.vista_instructor.instructores_creados if i.id_instructor == id_instructor), None)
 
         if clase_obj and instructor_obj:
             clase_obj.agregar_instructor(instructor_obj)
@@ -189,7 +197,8 @@ class VistaClases(ttk.Frame):
             return
 
         for c in self.clases_creadas:
-            instructor_nombre = c.instructor.nombre if hasattr(c, 'instructor') else ""
+            instructor_obj = getattr(c, 'instructor', None)
+            instructor_nombre = instructor_obj.nombre if instructor_obj else ""
             if termino_busqueda in str(c.id_clase).lower() or \
                termino_busqueda in str(c.tipo).lower() or \
                termino_busqueda in str(c.capacidad).lower() or \

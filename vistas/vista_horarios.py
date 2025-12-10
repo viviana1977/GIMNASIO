@@ -18,6 +18,7 @@ class VistaHorarios(ttk.Frame):
         ttk.Label(self.form_crear_horario_frame, text="Día de la semana:").grid(row=0, column=0, padx=5, pady=5, sticky="w")
         self.combo_horario_dia = ttk.Combobox(self.form_crear_horario_frame, values=["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"], state="readonly")
         self.combo_horario_dia.grid(row=0, column=1, padx=5, pady=5, sticky="ew")
+        ttk.Label(self.form_crear_horario_frame, text="Hora de Inicio (HH:MM):").grid(row=1, column=0, padx=5, pady=5, sticky="w")
         self.entry_horario_inicio = ttk.Entry(self.form_crear_horario_frame)
         self.entry_horario_inicio.grid(row=1, column=1, padx=5, pady=5, sticky="ew")
         ttk.Label(self.form_crear_horario_frame, text="Hora de Fin (HH:MM):").grid(row=2, column=0, padx=5, pady=5, sticky="w")
@@ -54,11 +55,16 @@ class VistaHorarios(ttk.Frame):
         self.btn_borrar_horario = ttk.Button(self.vista_horarios_frame, text="Borrar Horario Seleccionado", command=self.borrar_horario_seleccionado, style="Baja.TButton")
         self.btn_borrar_horario.pack(pady=5)
 
+        self.actualizar_vista_horarios()
+
     def actualizar_vista_horarios(self):
         """Limpia y actualiza la tabla de horarios con los datos más recientes."""
         # Limpiar vista previa
         for item in self.tree_horarios.get_children():
             self.tree_horarios.delete(item)
+
+        self.horarios_creados = Horario.obtener_todos()
+
         # Llenar con datos actualizados
         for h in self.horarios_creados:
             self.tree_horarios.insert("", tk.END, values=(h.id_dias, h.dia_semana, h.hora_inicio, h.hora_final))
@@ -83,9 +89,8 @@ class VistaHorarios(ttk.Frame):
             messagebox.showerror("Error", "Todos los campos son obligatorios.")
             return
 
-        id_horario = len(self.horarios_creados) + 1
-        nuevo_horario = Horario(id_horario, dia, inicio, fin)
-        self.horarios_creados.append(nuevo_horario)
+        nuevo_horario = Horario(None, dia, inicio, fin)
+        nuevo_horario.guardar()
 
         messagebox.showinfo("Éxito", f"Horario para el {dia} de {inicio} a {fin} creado.")
         print(f"Nuevo horario creado: ID={nuevo_horario.id_dias}, Día={nuevo_horario.dia_semana}")
@@ -94,7 +99,6 @@ class VistaHorarios(ttk.Frame):
         self.entry_horario_fin.delete(0, tk.END)
         self.ocultar_form_crear_horario()
         self.actualizar_vista_horarios()
-        self.actualizar_comboboxes_asignacion() # Actualiza el combo en la pestaña Clases
 
     def borrar_horario_seleccionado(self):
         """Borra el horario seleccionado en la tabla Treeview."""
