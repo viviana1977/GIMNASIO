@@ -5,3 +5,13 @@ from .vista_socio import VistaSocio
 from .vista_ejercicio import VistaEjercicio
 from .vista_equipamiento import VistaEquipamiento
 from .vista_rutina import VistaRutina
+
+__all__ = [
+    "VistaClases",
+    "VistaHorarios",
+    "VistaInstructor",
+    "VistaSocio",
+    "VistaEjercicio",
+    "VistaEquipamiento",
+    "VistaRutina"
+]

@@ -39,9 +39,8 @@ cursor.executescript('''
 
     CREATE TABLE IF NOT EXISTS "clases" (
         "id_clase" INTEGER NOT NULL UNIQUE,
-        "nombre" TEXT,
         "tipo" TEXT,
-        "capacidad" TEXT,
+        "nombre" TEXT,
         PRIMARY KEY("id_clase")
     );
 
