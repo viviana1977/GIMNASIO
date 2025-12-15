@@ -1,8 +1,8 @@
 import sqlite3
 
 class Horario:
-    def __init__(self, id_dias, dia_semana, hora_inicio, hora_final):   
-        self.id_dias = id_dias
+    def __init__(self, id_horario, dia_semana, hora_inicio, hora_final):   
+        self.id_horario = id_horario
         self.dia_semana = dia_semana
         self.hora_inicio = hora_inicio
         self.hora_final = hora_final
@@ -35,11 +35,19 @@ class Horario:
         conn = sqlite3.connect('gimnasio.db')
         cursor = conn.cursor()
         
-        sql = '''
-        INSERT INTO horarios (dia_semana, hora_inicio, hora_final) 
-        VALUES (?, ?, ?)
-        '''
-        parametros = (self.dia_semana, self.hora_inicio, self.hora_final)
+        if self.id_horario:
+            sql = '''
+            UPDATE horarios SET dia_semana = ?, hora_inicio = ?, hora_final = ?
+            WHERE id_horario = ?
+            '''
+
+            parametros = (self.dia_semana, self.hora_inicio, self.hora_final, self.id_horario)
+        else:
+            sql = '''
+            INSERT INTO horarios (dia_semana, hora_inicio, hora_final) 
+            VALUES (?, ?, ?)
+            '''
+            parametros = (self.dia_semana, self.hora_inicio, self.hora_final)
         
         cursor.execute(sql,parametros)
         conn.commit()
@@ -63,3 +71,15 @@ class Horario:
         conn.close()
 
         return horarios
+    
+    def eliminar(self):
+        conn = sqlite3.connect('gimnasio.db')
+        cursor = conn.cursor()
+
+        sql = '''
+        DELETE FROM horarios 
+        WHERE id_horario = ?
+        '''
+        cursor.execute(sql, (self.id_horario,))
+        conn.commit()
+        conn.close()

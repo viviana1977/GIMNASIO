@@ -15,10 +15,6 @@ class VistaRutina(ttk.Frame):
         # --- Formulario para Crear Rutina (inicialmente oculto) ---
         self.form_crear_rutina_frame = ttk.LabelFrame(self, text="Crear una nueva rutina", padding=(20, 10))
 
-        # --- Botón principal para crear rutina ---
-        self.btn_crear_rutina = ttk.Button(self, text="Crear Rutina", command=self.mostrar_form_crear_rutina, style="Alta.TButton")
-        self.btn_crear_rutina.pack(pady=10)
-
         ttk.Label(self.form_crear_rutina_frame, text="Tipo de Rutina:").grid(row=0, column=0, padx=5, pady=5, sticky="w")
         self.entry_rutina_tipo = ttk.Entry(self.form_crear_rutina_frame)
         self.entry_rutina_tipo.grid(row=0, column=1, padx=5, pady=5, sticky="ew")
@@ -56,8 +52,17 @@ class VistaRutina(ttk.Frame):
         self.tree_rutinas.column('id', width=50, anchor=tk.CENTER)
         self.tree_rutinas.pack(fill="both", expand=True)
 
-        self.btn_borrar_rutina = ttk.Button(self.vista_rutinas_frame, text="Borrar Rutina Seleccionada", command=self.borrar_rutina_seleccionada, style="Baja.TButton")
-        self.btn_borrar_rutina.pack(pady=5)
+        
+        self.btn_crear_rutina = ttk.Button(self.vista_rutinas_frame, text="Crear Rutina", command=self.mostrar_form_crear_rutina)
+        self.btn_crear_rutina.pack(pady=10,side=tk.LEFT)
+
+        self.btn_modificar_rutina = ttk.Button(self.vista_rutinas_frame, text="Modificar Rutina", command=self.mostrar_form_crear_rutina)
+        self.btn_modificar_rutina.pack(pady=10,side=tk.LEFT, padx=5)
+        
+        self.btn_borrar_rutina = ttk.Button(self.vista_rutinas_frame, text="Borrar Rutina", command=self.borrar_rutina)
+        self.btn_borrar_rutina.pack(pady=10,side=tk.LEFT)
+
+        self.actualizar_vista_rutinas()
 
     def actualizar_vista_rutinas(self):
         """Limpia y actualiza la tabla de rutinas."""
@@ -137,7 +142,7 @@ class VistaRutina(ttk.Frame):
         else:
             messagebox.showerror("Error", "No se encontró la rutina seleccionada.")
 
-    def borrar_rutina_seleccionada(self):
+    def borrar_rutina(self):
         """Borra la rutina seleccionada en la tabla Treeview."""
         selected_item = self.tree_rutinas.focus()
         if not selected_item:

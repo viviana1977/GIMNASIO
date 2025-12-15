@@ -13,11 +13,6 @@ class VistaSocio(ttk.Frame):
         # Se crea el frame del formulario pero no se muestra inicialmente (sin .pack())
         self.form_frame = ttk.LabelFrame(self, text="Registrar Nuevo Socio", padding=(20, 10))
 
-        
-
-        self.btn_alta_socio = ttk.Button(self, text="Alta Socio", command=self.mostrar_formulario_alta, style="Alta.TButton")
-        self.btn_alta_socio.pack(pady=20)
-
         # Creación de etiquetas y campos de entrada
         labels = ["Nombre y Apellido:", "DNI:", "Dirección:", "Fecha Nacimiento (DD/MM/AAAA):", "Teléfono:", "Email:", "Talle:", "Peso (kg):", "Objetivo:"]
         entries = []
@@ -67,8 +62,14 @@ class VistaSocio(ttk.Frame):
         self.tree_socios.column('id', width=50, anchor=tk.CENTER)
         self.tree_socios.pack(fill="both", expand=True)
 
-        btn_borrar_socio = ttk.Button(self.vista_socios_frame, text="Borrar Socio Seleccionado", command=self.borrar_socio_seleccionado, style="Baja.TButton")
-        btn_borrar_socio.pack(pady=5)
+        self.btn_crear_socio = ttk.Button(self.vista_socios_frame, text="Crear Socio", command=self.mostrar_formulario_crear_socio)
+        self.btn_crear_socio.pack(pady=10, side=tk.LEFT)
+
+        self.btn_modificar_socio = ttk.Button(self.vista_socios_frame, text="Modificar Socio", command=self.mostrar_formulario_crear_socio)
+        self.btn_modificar_socio.pack(pady=10, side=tk.LEFT, padx=5)
+
+        self.btn_borrar_socio = ttk.Button(self.vista_socios_frame, text="Borrar Socio", command=self.borrar_socio)
+        self.btn_borrar_socio.pack(pady=10, side=tk.LEFT)
 
         self.actualizar_vista_socios()
 
@@ -83,16 +84,16 @@ class VistaSocio(ttk.Frame):
         for socio in self.socios_creados:
             self.tree_socios.insert("", tk.END, values=(socio.id_socio, socio.nombre_apellido, socio.dni, socio.telefono))
 
-    def mostrar_formulario_alta(self):
+    def mostrar_formulario_crear_socio(self):
         """Muestra el formulario de registro y oculta el botón 'Alta'."""
-        self.btn_alta_socio.pack_forget()
+        self.btn_crear_socio.pack_forget()
         self.vista_socios_frame.pack_forget()
         self.form_frame.pack(padx=10, pady=10, fill="x")
 
 
     def ocultar_formulario_alta(self):
         """Oculta el formulario de registro y vuelve a mostrar el botón 'Alta'."""
-        self.btn_alta_socio.pack(pady=20)
+        self.btn_crear_socio.pack(pady=20)
         self.form_frame.pack_forget()
         self.btn_registrar.pack_forget()
         self.btn_cancelar.pack_forget()
@@ -131,7 +132,7 @@ class VistaSocio(ttk.Frame):
         self.ocultar_formulario_alta()
         self.actualizar_vista_socios()
 
-    def borrar_socio_seleccionado(self):
+    def borrar_socio(self):
         """Borra el socio seleccionado en la tabla Treeview."""
         selected_item = self.tree_socios.focus()
         if not selected_item:

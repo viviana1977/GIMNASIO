@@ -4,13 +4,11 @@ from modelos import Clases
 
 # --- Pestaña Clases ---
 class VistaClases(ttk.Frame):
-    def __init__(self, master, vista_instructor, vista_horarios):
+    def __init__(self, master):
         super().__init__(master)
         master.add(self, text="Clases") # Changed text to "Clases" for consistency
         self.clases_creadas = []
-        self.vista_instructor = vista_instructor
         self.id_clase_a_editar = None
-        self.vista_horarios = vista_horarios
  
         #-- Formulario de Creación de Clases (initially hidden) ---
         self.form_crear_clase_frame = ttk.LabelFrame(self, text="Crear Clase", padding=(20, 10))
@@ -64,16 +62,14 @@ class VistaClases(ttk.Frame):
         self.tree_clases.pack(fill="both", expand=True)
 
         #---button to show the registration form---
-        self.btn_crear_clase = ttk.Button(self.vista_clases_frame, text="Crear Nueva Clase", command=self.mostrar_form_crear_clase)
-        self.btn_crear_clase.pack(pady=15, side=tk.LEFT)
+        self.btn_crear_clase = ttk.Button(self.vista_clases_frame, text="Crear Clase", command=self.mostrar_form_crear_clase)
+        self.btn_crear_clase.pack(pady=10, side=tk.LEFT)
 
         self.btn_modificar_clase = ttk.Button(self.vista_clases_frame, text="Modificar Clase", command=self.mostrar_form_modificar_clase)
-        self.btn_modificar_clase.pack(pady=15, side=tk.LEFT, padx=5)
+        self.btn_modificar_clase.pack(pady=10, side=tk.LEFT, padx=5)
 
-        self.btn_borrar_clase = ttk.Button(self.vista_clases_frame, 
-                                           text="Borrar Clase Seleccionada",
-                                           command=self.borrar_clase_seleccionada) #
-        self.btn_borrar_clase.pack(pady=15, side=tk.LEFT)
+        self.btn_borrar_clase = ttk.Button(self.vista_clases_frame, text="Borrar Clase", command=self.borrar_clase) #
+        self.btn_borrar_clase.pack(pady=10, side=tk.LEFT)
 
         self.actualizar_vista_clases()
 
@@ -82,18 +78,16 @@ class VistaClases(ttk.Frame):
             """Limpia y actualiza la tabla de clases."""    
             for item in self.tree_clases.get_children():
                 self.tree_clases.delete(item)
+
             self.clases_creadas: list[Clases] = Clases.obtener_todos()
 
             for c in self.clases_creadas:
                 self.tree_clases.insert("", tk.END, text=c.id_clase, values=(c.tipo, c.nombre))
 
     def mostrar_form_crear_clase(self):
-        """Muestra el formulario para crear una nueva clase."""
-        # Limpiar campos por si tenían datos de una modificación anterior
         self.entry_clase_tipo.delete(0, tk.END)
         self.entry_clase_nombre.delete(0, tk.END)
 
-        # Configurar el formulario para "Crear"
         self.form_crear_clase_frame.config(text="Crear Clase")
         self.btn_guardar_clase.config(text="Guardar Clase", command=self.guardar_clase)
         self.id_clase_a_editar = None
@@ -102,7 +96,6 @@ class VistaClases(ttk.Frame):
         self.vista_clases_frame.pack_forget()
 
     def mostrar_form_modificar_clase(self):
-        """Muestra el formulario para modificar una clase existente, con los datos cargados."""
         selected_item = self.tree_clases.focus()
         if not selected_item:
             messagebox.showerror("Error", "Por favor, seleccione una clase para modificar.")
@@ -115,15 +108,12 @@ class VistaClases(ttk.Frame):
             messagebox.showerror("Error", "No se encontró la clase seleccionada.")
             return
 
-        # Limpiar campos antes de llenarlos
         self.entry_clase_tipo.delete(0, tk.END)
         self.entry_clase_nombre.delete(0, tk.END)
 
-        # Llenar campos con la información de la clase
         self.entry_clase_tipo.insert(0, clase_a_modificar.tipo)
         self.entry_clase_nombre.insert(0, clase_a_modificar.nombre)
 
-        # Configurar el formulario para "Modificar"
         self.id_clase_a_editar = id_clase
         self.form_crear_clase_frame.config(text="Modificar Clase")
         self.btn_guardar_clase.config(text="Actualizar Clase", command=self.actualizar_clase)
@@ -153,7 +143,6 @@ class VistaClases(ttk.Frame):
         self.actualizar_vista_clases()
 
     def actualizar_clase(self):
-        """Guarda los cambios de una clase existente."""
         tipo = self.entry_clase_tipo.get()
         nombre = self.entry_clase_nombre.get()
 
@@ -163,8 +152,7 @@ class VistaClases(ttk.Frame):
 
         self.guardar_clase()
 
-    def borrar_clase_seleccionada(self):
-        """Borra la clase seleccionada en la tabla Treeview."""
+    def borrar_clase(self):
         selected_item = self.tree_clases.focus()
 
         if not selected_item:
@@ -184,7 +172,6 @@ class VistaClases(ttk.Frame):
             self.actualizar_vista_clases()
 
     def buscar_clases(self):
-        """Filtra la tabla de clases según el término de búsqueda."""
         termino_busqueda = self.entry_buscar_clase.get().lower()
 
         for item in self.tree_clases.get_children():

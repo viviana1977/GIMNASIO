@@ -9,10 +9,6 @@ class VistaEquipamiento(ttk.Frame):
         master.add(self, text="Equipamiento")
         self.equipos_creados = []
 
-        # --- Botón principal y formularios de Equipamiento ---
-        self.btn_agregar_equipo = ttk.Button(self, text="Agregar Equipamiento", command=self.mostrar_form_agregar_equipo, style="Alta.TButton")
-        self.btn_agregar_equipo.pack(pady=10)
-
         self.form_agregar_equipo_frame = ttk.LabelFrame(self,text="Agregar Nuevo Equipamiento", padding=(20, 10))
         labels_equipo = {"Tipo de Máquina:": 0, "Capacidad:": 1, "Músculos que trabaja:": 2, "Estado Inicial:": 3}
         entry_equipo_tipo = ttk.Entry(self.form_agregar_equipo_frame)
@@ -52,8 +48,14 @@ class VistaEquipamiento(ttk.Frame):
         tree_equipos.column('id', width=50, anchor=tk.CENTER)
         tree_equipos.pack(fill="both", expand=True)
 
-        btn_borrar_equipo = ttk.Button(self.vista_equipos_frame, text="Borrar Equipo Seleccionado", command=self.borrar_equipo_seleccionado, style="Baja.TButton")
-        btn_borrar_equipo.pack(pady=5)
+        self.btn_agregar_equipo = ttk.Button(self.vista_equipos_frame, text="Crear Equipamiento", command=self.mostrar_form_crear_equipo)
+        self.btn_agregar_equipo.pack(pady=10, side=tk.LEFT)
+
+        self.btn_modificar_equipo = ttk.Button(self.vista_equipos_frame, text="Modificar Equipamiento", command=self.mostrar_form_crear_equipo)
+        self.btn_modificar_equipo.pack(pady=10, side=tk.LEFT, padx=5)
+
+        btn_borrar_equipo = ttk.Button(self.vista_equipos_frame, text="Borrar Equipamiento", command=self.borrar_equipo)
+        btn_borrar_equipo.pack(pady=10, side=tk.LEFT)
     
     def actualizar_vista_equipos(self):
         """Limpia y actualiza la tabla de equipos."""
@@ -68,7 +70,7 @@ class VistaEquipamiento(ttk.Frame):
         # combo_equipos_gestion['values'] = nombres_equipos
 
 
-    def mostrar_form_agregar_equipo(self):
+    def mostrar_form_crear_equipo(self):
         """Muestra el formulario para agregar un nuevo equipo."""
         self.btn_agregar_equipo.pack_forget()
         self.form_agregar_equipo_frame.pack(padx=10, pady=10, fill="x")
@@ -122,7 +124,7 @@ class VistaEquipamiento(ttk.Frame):
         else:
             messagebox.showerror("Error", "No se encontró el equipo seleccionado.")
 
-    def borrar_equipo_seleccionado(self):
+    def borrar_equipo(self):
         """Borra el equipo seleccionado en la tabla Treeview."""
         selected_item = self.tree_equipos.focus()
         if not selected_item:

@@ -56,11 +56,11 @@ cursor.executescript('''
     );
 
     CREATE TABLE IF NOT EXISTS "horarios" (
-        "id_horarios" INTEGER NOT NULL UNIQUE,
+        "id_horario" INTEGER NOT NULL UNIQUE,
         "dia_semana" TEXT,
         "hora_inicio" TEXT,
         "hora_final" TEXT,
-        PRIMARY KEY("id_horarios")
+        PRIMARY KEY("id_horario")
     );
 
     CREATE TABLE IF NOT EXISTS "instructor_horario" (
@@ -81,6 +81,14 @@ cursor.executescript('''
         "telefono" TEXT,
         "sueldo" INTEGER,
         PRIMARY KEY("id_instructor")
+    );
+                     
+    CREATE TABLE IF NOT EXISTS "equipamientos" (
+        "id_equipamiento" INTEGER NOT NULL UNIQUE,
+        "capacidad" TEXT,
+        "musculo" TEXT,
+        "estado" TEXT,
+        PRIMARY KEY("id_equipamiento")
     );
 
     CREATE TABLE IF NOT EXISTS "usuarios" (

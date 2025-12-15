@@ -9,10 +9,6 @@ class VistaEjercicio(ttk.Frame):
         master.add(self, text="Ejercicio")
         self.ejercicios_creados = []
 
-        # --- Widgets de la Pestaña Ejercicios ---
-        self.btn_crear_ejercicio = ttk.Button(self, text="Crear Nuevo Ejercicio", command=self.mostrar_form_crear_ejercicio, style="Alta.TButton")
-        self.btn_crear_ejercicio.pack(pady=10)
-
         self.form_crear_ejercicio_frame = ttk.LabelFrame(self, text="Crear Ejercicio", padding=(20, 10))
         labels_ejercicio = ["Nombre:", "Descripción:", "Grupo Muscular:", "Repeticiones:", "Series:", "Duración (seg):"]
         entries_ejercicio = [ttk.Entry(self.form_crear_ejercicio_frame) for _ in labels_ejercicio]
@@ -50,8 +46,17 @@ class VistaEjercicio(ttk.Frame):
         self.tree_ejercicios.column('duracion', width=50, anchor=tk.CENTER)
         self.tree_ejercicios.pack(fill="both", expand=True)
 
-        btn_borrar_ejercicio = ttk.Button(self.vista_ejercicios_frame, text="Borrar Ejercicio Seleccionado", command=self.borrar_ejercicio_seleccionado, style="Baja.TButton")
-        btn_borrar_ejercicio.pack(pady=5)
+        # --- Widgets de la Pestaña Ejercicios ---
+        self.btn_crear_ejercicio = ttk.Button(self.vista_ejercicios_frame, text="Crear Ejercicio", command=self.mostrar_form_crear_ejercicio)
+        self.btn_crear_ejercicio.pack(pady=10,side=tk.LEFT)
+
+        self.btn_modificar_ejercicio = ttk.Button(self.vista_ejercicios_frame, text="Modificar Ejercicio", command=self.mostrar_form_crear_ejercicio)
+        self.btn_modificar_ejercicio.pack(pady=10,side=tk.LEFT, padx=5)
+
+        btn_borrar_ejercicio = ttk.Button(self.vista_ejercicios_frame, text="Borrar Ejercicio", command=self.borrar_ejercicio)
+        btn_borrar_ejercicio.pack(pady=10, side=tk.LEFT)
+
+        self.actualizar_vista_ejercicios()
 
     def actualizar_vista_ejercicios(self):
         """Limpia y actualiza la tabla de ejercicios."""
@@ -92,7 +97,7 @@ class VistaEjercicio(ttk.Frame):
         self.ocultar_form_crear_ejercicio()
         self.actualizar_vista_ejercicios()
 
-    def borrar_ejercicio_seleccionado(self):
+    def borrar_ejercicio(self):
         """Borra el ejercicio seleccionado en la tabla Treeview."""
         selected_item = self.tree_ejercicios.focus()  # Obtiene el item seleccionado
         if not selected_item:

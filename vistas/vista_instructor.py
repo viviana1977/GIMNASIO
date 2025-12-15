@@ -8,11 +8,7 @@ class VistaInstructor(ttk.Frame):
         super().__init__(master)
         master.add(self, text="Instructor") # Changed text to "Instructor" for consistency
         self.instructores_creados = []
-
-        # --- Button to show the registration form ---
-        self.btn_alta_instructor = ttk.Button(self, text="Alta Instructor", command=self.mostrar_form_alta_instructor, style="Alta.TButton")
-        self.btn_alta_instructor.pack(pady=10)
-
+        
         # --- Formulario de Registro de Instructores (initially hidden) ---
         self.form_alta_instructor_frame = ttk.LabelFrame(self, text="Registrar Nuevo Instructor", padding=(20, 10))
 
@@ -68,10 +64,16 @@ class VistaInstructor(ttk.Frame):
         self.tree_instructores.column('id', width=50, anchor=tk.CENTER)
         self.tree_instructores.pack(fill="both", expand=True)
 
-        self.btn_borrar_instructor = ttk.Button(self.vista_instructores_frame, 
-                                                text="Borrar Instructor Seleccionado", 
-                                                command=self.borrar_instructor_seleccionado, style="Baja.TButton")
-        self.btn_borrar_instructor.pack(pady=5)
+       
+       # --- Button to show the registration form ---
+        self.btn_alta_instructor = ttk.Button(self.vista_instructores_frame, text="Crear Instructor", command=self.mostrar_form_crear_instructor)
+        self.btn_alta_instructor.pack(pady=10, side=tk.LEFT)
+
+        self.btn_modificar_instructor = ttk.Button(self.vista_instructores_frame, text="Modificar Instructor", command=self.mostrar_form_crear_instructor)
+        self.btn_modificar_instructor.pack(pady=10, side=tk.LEFT, padx=5)
+       
+        self.btn_borrar_instructor = ttk.Button(self.vista_instructores_frame, text="Borrar Instructor", command=self.borrar_instructor)
+        self.btn_borrar_instructor.pack(pady=10, side=tk.LEFT)
 
         # Initial update of the view
         self.actualizar_vista_instructores()
@@ -91,7 +93,7 @@ class VistaInstructor(ttk.Frame):
             self.tree_instructores.insert("", tk.END, values=(inst.id_instructor, 
                                                              inst.nombre, inst.telefono, inst.sueldo))
 
-    def mostrar_form_alta_instructor(self):
+    def mostrar_form_crear_instructor(self):
         """Muestra el formulario para dar de alta un instructor."""
         self.btn_alta_instructor.pack_forget()
         self.vista_instructores_frame.pack_forget()
@@ -128,7 +130,7 @@ class VistaInstructor(ttk.Frame):
         self.ocultar_form_alta_instructor()
         self.actualizar_vista_instructores()
 
-    def borrar_instructor_seleccionado(self):
+    def borrar_instructor(self):
         """Borra el instructor seleccionado en la tabla Treeview."""
         selected_item = self.tree_instructores.focus()
         if not selected_item:
