@@ -24,11 +24,19 @@ class Instructor:
         conn = sqlite3.connect('gimnasio.db')
         cursor = conn.cursor()
         
-        sql = '''
-        INSERT INTO instructores (nombre, direccion, telefono, sueldo)
-        VALUES (?, ?, ?, ?)
-        '''
-        parametros = (self.nombre, self.direccion, self.telefono, self.sueldo)
+        if self.id_instructor:
+            sql = '''
+            UPDATE instructores 
+            SET nombre = ?, direccion = ?, telefono = ?, sueldo = ?
+            WHERE id_instructor = ?
+            '''
+            parametros = (self.nombre, self.direccion, self.telefono, self.sueldo, self.id_instructor)
+        else:
+            sql = '''
+            INSERT INTO instructores (nombre, direccion, telefono, sueldo)
+            VALUES (?, ?, ?, ?)
+            '''
+            parametros = (self.nombre, self.direccion, self.telefono, self.sueldo)
         
         cursor.execute(sql,parametros)
         conn.commit()
@@ -50,3 +58,16 @@ class Instructor:
         conn.close()
 
         return instructores
+    
+    def eliminar(self):
+        conn = sqlite3.connect('gimnasio.db')
+        cursor = conn.cursor()
+
+        sql = '''
+        DELETE FROM instructores
+        WHERE id_instructor = ?
+        '''
+
+        cursor.execute(sql, (self.id_instructor,))
+        conn.commit()
+        conn.close()

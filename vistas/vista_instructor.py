@@ -8,6 +8,7 @@ class VistaInstructor(ttk.Frame):
         super().__init__(master)
         master.add(self, text="Instructor") # Changed text to "Instructor" for consistency
         self.instructores_creados = []
+        self.id_instructor_a_editar = None
         
         # --- Formulario de Registro de Instructores (initially hidden) ---
         self.form_alta_instructor_frame = ttk.LabelFrame(self, text="Registrar Nuevo Instructor", padding=(20, 10))
@@ -31,7 +32,7 @@ class VistaInstructor(ttk.Frame):
         # Buttons for the form
         self.btn_guardar_instructor = ttk.Button(self.form_alta_instructor_frame, 
                                                  text="Guardar Instructor", 
-                                                 command=self.guardar_nuevo_instructor)
+                                                 command=self.guardar_instructor)
         self.btn_guardar_instructor.grid(row=len(labels_instructor_text), column=0, 
                                          columnspan=2, pady=10)
         self.btn_cancelar_instructor_form = ttk.Button(self.form_alta_instructor_frame, 
@@ -55,13 +56,11 @@ class VistaInstructor(ttk.Frame):
                                                 command=self.buscar_instructores)
         self.btn_buscar_instructor.pack(side='right', padx=(5, 0))
 
-        columns_inst = ('id', 'nombre', 'telefono', 'sueldo')
+        columns_inst = ('nombre', 'telefono', 'sueldo')
         self.tree_instructores = ttk.Treeview(self.vista_instructores_frame, columns=columns_inst, show='headings')
-        self.tree_instructores.heading('id', text='ID')
         self.tree_instructores.heading('nombre', text='Nombre')
         self.tree_instructores.heading('telefono', text='Teléfono')
         self.tree_instructores.heading('sueldo', text='Sueldo')
-        self.tree_instructores.column('id', width=50, anchor=tk.CENTER)
         self.tree_instructores.pack(fill="both", expand=True)
 
        
@@ -69,7 +68,7 @@ class VistaInstructor(ttk.Frame):
         self.btn_alta_instructor = ttk.Button(self.vista_instructores_frame, text="Crear Instructor", command=self.mostrar_form_crear_instructor)
         self.btn_alta_instructor.pack(pady=10, side=tk.LEFT)
 
-        self.btn_modificar_instructor = ttk.Button(self.vista_instructores_frame, text="Modificar Instructor", command=self.mostrar_form_crear_instructor)
+        self.btn_modificar_instructor = ttk.Button(self.vista_instructores_frame, text="Modificar Instructor", command=self.mostrar_form_modificar_instructor)
         self.btn_modificar_instructor.pack(pady=10, side=tk.LEFT, padx=5)
        
         self.btn_borrar_instructor = ttk.Button(self.vista_instructores_frame, text="Borrar Instructor", command=self.borrar_instructor)
@@ -78,38 +77,67 @@ class VistaInstructor(ttk.Frame):
         # Initial update of the view
         self.actualizar_vista_instructores()
 
-    def get_instructores_creados(self):
-        """Returns the list of created instructor objects."""
-        return self.instructores_creados
-
     def actualizar_vista_instructores(self):
         """Limpia y actualiza la tabla de instructores."""
         for item in self.tree_instructores.get_children():
             self.tree_instructores.delete(item)
 
-        self.instructores_creados = Instructor.obtener_todos()
+        self.instructores_creados: list[Instructor] = Instructor.obtener_todos()
 
         for inst in self.instructores_creados:
-            self.tree_instructores.insert("", tk.END, values=(inst.id_instructor, 
+            self.tree_instructores.insert("", tk.END, text=inst.id_instructor, values=(inst.id_instructor, 
                                                              inst.nombre, inst.telefono, inst.sueldo))
 
     def mostrar_form_crear_instructor(self):
-        """Muestra el formulario para dar de alta un instructor."""
-        self.btn_alta_instructor.pack_forget()
-        self.vista_instructores_frame.pack_forget()
+        self.entry_instructor_direccion.delete(0, tk.END)
+        self.entry_instructor_nombre.delete(0, tk.END)
+        self.entry_instructor_sueldo.delete(0, tk.END)
+        self.entry_instructor_telefono.delete(0, tk.END)
+
+        self.form_alta_instructor_frame.config(text="Crear Instructor")
+        self.btn_guardar_instructor.config(text="Guardar Instructor", command=self.guardar_instructor)
+        self.id_instructor_a_editar = None
+
         self.form_alta_instructor_frame.pack(padx=10, pady=10, fill="x")
+        self.vista_instructores_frame.pack_forget()
+
+    def mostrar_form_modificar_instructor(self):
+        selected_item = self.tree_instructores.focus()
+        if not selected_item:
+            messagebox.showerror("Error", "Por favor, seleccione un instructor para modificar.")
+            return
+
+        id_instructor = self.tree_instructores.item(selected_item, 'text')
+        instructor_a_editar = next((i for i in self.instructores_creados if i.id_instructor == id_instructor), None)
+
+        if not instructor_a_editar:
+            messagebox.showerror("Error", "No se encontró el instructor seleccionado.")
+            return
+        
+        self.entry_instructor_direccion.delete(0, tk.END)
+        self.entry_instructor_nombre.delete(0, tk.END)
+        self.entry_instructor_sueldo.delete(0, tk.END)
+        self.entry_instructor_telefono.delete(0, tk.END)
+
+        self.entry_instructor_direccion.insert(0, instructor_a_editar.direccion)
+        self.entry_instructor_nombre.insert(0, instructor_a_editar.nombre)
+        self.entry_instructor_sueldo.insert(0, instructor_a_editar.sueldo)
+        self.entry_instructor_telefono.insert(0, instructor_a_editar.telefono)
+
+        self.id_instructor_a_editar = id_instructor
+
+        self.form_alta_instructor_frame.config(text="Modificar Instructor")
+        self.btn_guardar_instructor.config(text="Actualizar Clase", command=self.actualizar_instructor)
+
+        self.form_alta_instructor_frame.pack(padx=10, pady=10, fill="x")
+        self.vista_instructores_frame.pack_forget()
 
     def ocultar_form_alta_instructor(self):
-        """Oculta el formulario de alta y muestra la vista principal."""
+        self.id_instructor_a_editar = None
         self.form_alta_instructor_frame.pack_forget()
-        self.btn_alta_instructor.pack(pady=10)
         self.vista_instructores_frame.pack(padx=10, pady=10, fill="both", expand=True)
-        # Clear form fields when hiding
-        for entry in self.entries_instructor:
-            entry.delete(0, tk.END)
 
-    def guardar_nuevo_instructor(self):
-        """Guarda un nuevo instructor y actualiza la vista."""
+    def guardar_instructor(self):
         nombre = self.entry_instructor_nombre.get()
         direccion = self.entry_instructor_direccion.get()
         telefono = self.entry_instructor_telefono.get()
@@ -119,59 +147,59 @@ class VistaInstructor(ttk.Frame):
             messagebox.showerror("Error", "Todos los campos son obligatorios.")
             return
 
-        nuevo_instructor = Instructor(None, nombre, direccion, telefono, sueldo)
+        nuevo_instructor = Instructor(self.id_instructor_a_editar, nombre, direccion, telefono, sueldo)
         nuevo_instructor.guardar()
 
         messagebox.showinfo("Éxito", f"Instructor {nombre} registrado correctamente.")
-        print(f"Nuevo instructor registrado: ID={nuevo_instructor.id_instructor}, "
-              f"Nombre={nuevo_instructor.nombre}")
 
-        # Clear form fields and hide the form
         self.ocultar_form_alta_instructor()
         self.actualizar_vista_instructores()
 
+    def actualizar_instructor(self):
+        nombre = self.entry_instructor_nombre.get()
+        direccion = self.entry_instructor_direccion.get()
+        telefono = self.entry_instructor_telefono.get()
+        sueldo = self.entry_instructor_sueldo.get()
+
+        if not all([nombre, direccion, telefono, sueldo]):
+            messagebox.showerror("Error", "Todos los campos son obligatorios.")
+            return
+        
+        self.guardar_instructor()
+
     def borrar_instructor(self):
-        """Borra el instructor seleccionado en la tabla Treeview."""
         selected_item = self.tree_instructores.focus()
+
         if not selected_item:
             messagebox.showerror("Error", "Por favor, seleccione un instructor para borrar.")
             return
 
-        if not messagebox.askyesno("Confirmar Borrado", 
-                                   "¿Está seguro de que desea borrar el instructor seleccionado?"):
+        if not messagebox.askyesno("Confirmar Borrado", "¿Está seguro de que desea borrar el instructor seleccionado?"):
             return
 
-        item_values = self.tree_instructores.item(selected_item, 'values')
-        id_a_borrar = int(item_values[0])
+        id_a_borrar = self.tree_instructores.item(selected_item, 'text')
 
-        instructor_a_borrar = next((inst for inst in self.instructores_creados 
-                                    if inst.id_instructor == id_a_borrar), None)
+        instructor_a_borrar = next((inst for inst in self.instructores_creados if inst.id_instructor == id_a_borrar), None)
         
         if instructor_a_borrar:
-            self.instructores_creados.remove(instructor_a_borrar)
+            instructor_a_borrar.eliminar()
             messagebox.showinfo("Éxito", f"Instructor '{instructor_a_borrar.nombre}' borrado correctamente.")
             self.actualizar_vista_instructores()
-            # Removed: actualizar_comboboxes_asignacion() - This should be handled by the main app if needed.
 
     def buscar_instructores(self):
         """Filtra la tabla de instructores según el término de búsqueda."""
         termino_busqueda = self.entry_buscar_instructor.get().lower()
 
-        # Limpiar la tabla antes de mostrar los resultados
         for item in self.tree_instructores.get_children():
             self.tree_instructores.delete(item)
 
-        # Si no hay término de búsqueda, mostrar todos y salir
         if not termino_busqueda:
             self.actualizar_vista_instructores()
             return
 
-        # Filtrar instructores
         for inst in self.instructores_creados:
-            # Convertimos todos los valores a string y minúsculas para una búsqueda flexible
             if  termino_busqueda in str(inst.id_instructor).lower() or \
                 termino_busqueda in str(inst.nombre).lower() or \
                 termino_busqueda in str(inst.telefono).lower() or \
                 termino_busqueda in str(inst.sueldo).lower():
-                self.tree_instructores.insert("", tk.END, values=(inst.id_instructor, 
-                                                                    inst.nombre, inst.telefono, inst.sueldo))
+                self.tree_instructores.insert("", tk.END, values=(inst.id_instructor, inst.nombre, inst.telefono, inst.sueldo))

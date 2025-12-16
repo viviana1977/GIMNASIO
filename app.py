@@ -72,7 +72,7 @@ class App(tk.Tk):
         
         # Centrar la ventana principal después del login
         self._centrar_ventana(800, 600)
-        self.state('zoomed')
+        self.state('normal')
         self.resizable(True, True)
         self.title(f"GIMNASIO - Rol: {rol.capitalize()}")
 

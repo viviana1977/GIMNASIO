@@ -23,9 +23,7 @@ cursor.executescript('''
         "id-rutina" INTEGER NOT NULL UNIQUE,
         "tipo" TEXT,
         "duracion" TEXT,
-        PRIMARY KEY("id-rutina"),
-        FOREIGN KEY ("id-rutina") REFERENCES "rutina_clase"("id_rutina")
-        ON UPDATE NO ACTION ON DELETE NO ACTION
+        PRIMARY KEY("id-rutina")
     );
 
     CREATE TABLE IF NOT EXISTS "rutina_clase" (

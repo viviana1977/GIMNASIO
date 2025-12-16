@@ -115,6 +115,7 @@ class VistaClases(ttk.Frame):
         self.entry_clase_nombre.insert(0, clase_a_modificar.nombre)
 
         self.id_clase_a_editar = id_clase
+        
         self.form_crear_clase_frame.config(text="Modificar Clase")
         self.btn_guardar_clase.config(text="Actualizar Clase", command=self.actualizar_clase)
 
