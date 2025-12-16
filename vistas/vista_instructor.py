@@ -85,8 +85,7 @@ class VistaInstructor(ttk.Frame):
         self.instructores_creados: list[Instructor] = Instructor.obtener_todos()
 
         for inst in self.instructores_creados:
-            self.tree_instructores.insert("", tk.END, text=inst.id_instructor, values=(inst.id_instructor, 
-                                                             inst.nombre, inst.telefono, inst.sueldo))
+            self.tree_instructores.insert("", tk.END, text=inst.id_instructor, values=(inst.nombre, inst.telefono, inst.sueldo))
 
     def mostrar_form_crear_instructor(self):
         self.entry_instructor_direccion.delete(0, tk.END)
@@ -127,7 +126,7 @@ class VistaInstructor(ttk.Frame):
         self.id_instructor_a_editar = id_instructor
 
         self.form_alta_instructor_frame.config(text="Modificar Instructor")
-        self.btn_guardar_instructor.config(text="Actualizar Clase", command=self.actualizar_instructor)
+        self.btn_guardar_instructor.config(text="Actualizar Instructor", command=self.actualizar_instructor)
 
         self.form_alta_instructor_frame.pack(padx=10, pady=10, fill="x")
         self.vista_instructores_frame.pack_forget()

@@ -71,3 +71,22 @@ class Instructor:
         cursor.execute(sql, (self.id_instructor,))
         conn.commit()
         conn.close()
+
+    @classmethod
+    def obtener_por_id(cls, id_instructor):
+        conn = sqlite3.connect('gimnasio.db')
+        cursor = conn.cursor()
+
+        sql = '''
+        SELECT * FROM instructores
+        WHERE id_instructor = ?
+        '''
+
+        cursor.execute(sql, (id_instructor,))
+        row = cursor.fetchone()
+        conn.close()
+
+        if row:
+            return cls(row[0], row[1], row[2], row[3], row[4])
+        else:
+            return None

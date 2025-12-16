@@ -42,33 +42,17 @@ cursor.executescript('''
         PRIMARY KEY("id_clase")
     );
 
-    CREATE TABLE IF NOT EXISTS "clases_horarios" (
-        "id_clase_horario" INTEGER NOT NULL UNIQUE,
-        "id_clase" INTEGER,
-        "id_horario" INTEGER,
-        PRIMARY KEY("id_clase_horario"),
-        FOREIGN KEY ("id_clase") REFERENCES "clases"("id_clase")
-        ON UPDATE NO ACTION ON DELETE NO ACTION,
-        FOREIGN KEY ("id_horario") REFERENCES "horarios"("id_horarios")
-        ON UPDATE NO ACTION ON DELETE NO ACTION
-    );
-
     CREATE TABLE IF NOT EXISTS "horarios" (
         "id_horario" INTEGER NOT NULL UNIQUE,
         "dia_semana" TEXT,
         "hora_inicio" TEXT,
         "hora_final" TEXT,
-        PRIMARY KEY("id_horario")
-    );
-
-    CREATE TABLE IF NOT EXISTS "instructor_horario" (
-        "id_instructor_horario" INTEGER NOT NULL UNIQUE,
         "id_instructor" INTEGER,
-        "id_horario" INTEGER,
-        PRIMARY KEY("id_instructor_horario"),
-        FOREIGN KEY ("id_instructor") REFERENCES "instructor"("id_instructor")
+        "id_clase" INTEGER,
+        PRIMARY KEY("id_horario"),
+        FOREIGN KEY ("id_instructor") REFERENCES "instructores"("id_instructor")
         ON UPDATE NO ACTION ON DELETE NO ACTION,
-        FOREIGN KEY ("id_horario") REFERENCES "horarios"("id_horarios")
+        FOREIGN KEY("id_clase") REFERENCES "clases"("id_clase")
         ON UPDATE NO ACTION ON DELETE NO ACTION
     );
 
