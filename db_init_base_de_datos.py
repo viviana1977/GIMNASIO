@@ -81,7 +81,7 @@ cursor.executescript('''
     );
 ''')
 
-cursor.execute("INSERT OR IGNORE INTO usuarios (nombre_usuario, contraseña, rol) VALUES ('dueño', 'dueño123', 'propietario')")
-cursor.execute("INSERT OR IGNORE INTO usuarios (nombre_usuario, contraseña, rol) VALUES ('instructor', 'instructor123', 'instructor')")
+cursor.execute("INSERT OR IGNORE INTO usuarios (nombre_usuario, contraseña, rol) VALUES ('administrador', 'admin', 'propietario')")
+cursor.execute("INSERT OR IGNORE INTO usuarios (nombre_usuario, contraseña, rol) VALUES ('instructor', 'instructor', 'instructor')")
 mi_conexion.commit()
 mi_conexion.close()
